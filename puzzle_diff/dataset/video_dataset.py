@@ -29,7 +29,6 @@ class Video_dataset(pyg_data.Dataset):
         assert dataset is not None and dataset_get_fn is not None
         self.dataset = dataset
         self.dataset_get_fn = dataset_get_fn
-
         self.transforms = transforms.Compose(
             [
                 transforms.ToTensor(),

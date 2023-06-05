@@ -40,8 +40,9 @@ class Assembly_dt(Dataset):
         return video
 
 if __name__ == "__main__":
-        dt = assembly_dt()
+        dt = Assembly_dt()
         x = dt[30]
+        breakpoint()
         print(len(x))
         plt.figure()
         plt.imshow(x[50])

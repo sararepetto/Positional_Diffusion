@@ -155,13 +155,7 @@ class Eff_GAT_Vist(nn.Module):
         else:
             with torch.no_grad():
                 phrases = [y for x in patch_rgb for y in x]
-                tokens = self.tokenizer(phrases, return_tensors="pt", padding=True).to(
-                    self.text_encoder.device
-                )
-                text_emb = self.text_encoder(**tokens)["last_hidden_state"]
-
-        attn_mask = (1 - tokens["attention_mask"]).bool()
-        feats = self.transformer_encode(text_emb, src_key_padding_mask=attn_mask)
+                tokual_ba.transformer_encode(text_emb, src_key_padding_mask=attn_mask)
 
         return feats[:, 0, :]
 
