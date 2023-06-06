@@ -42,6 +42,7 @@ class Assembly_dt(Dataset):
 if __name__ == "__main__":
         dt = Assembly_dt()
         x = dt[30]
+        #frames = torch.cat([self.transforms(img)[None, :] for img in images])
         breakpoint()
         print(len(x))
         plt.figure()

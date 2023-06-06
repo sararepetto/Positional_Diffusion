@@ -9,24 +9,24 @@ import torch.nn.functional as F
 from torch.backends import cudnn
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import Compose
+from math import sin, cos, radians
 
-def randominit(seed=1990):
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    cudnn.deterministic = True
-    cudnn.benchmark = False
-    random.seed(seed)
 
 class NTU_60_dt(Dataset):
-    def __init__(self,aug=None,rot_angle=0):
+    def __init__(self,aug='rotate',train=True):
         super().__init__()
         self.aug = aug
-        self.rot_angle= rot_angle
         self.transform = aug_transform()
-        self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_data_1.pt'))
-        self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_label_1.pt'))
+        self.angle_y= random.randint(-30, 30)
+        beta = radians(self.angle_y)
+        self.rot_angle = [0, self.angle_y, 0]
+        if train == False:
+            self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/test_data_1.pt'))
+            self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/test_label_1.pt'))  
+        else:
+            self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_data_1.pt'))
+            self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_label_1.pt'))
+
         self.N, _, _, self.T = self.data.shape
     def __len__(self):
         return self.N
@@ -37,7 +37,7 @@ class NTU_60_dt(Dataset):
         rot = torch.empty([])
         if self.aug != 'None':
             data_aug = self.transform(data.permute(1, 2, 0).unsqueeze(-1).numpy()).squeeze().permute(2, 0, 1).float()
-            if 'rotate' in args.aug:
+            if 'rotate' in self.aug:
                 rot = self.convert_rot_labels(self.rot_angle)
         label = self.label[index].item()
         return data, label, rot, data_aug  # [J, C, T]
@@ -81,20 +81,7 @@ def aug_transform():
 
 
 
-def parseargs():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--aug', type=str, default='gausNoise',
-                        help="choose a single or combos (_-separated) of "
-                             " 'gausNoise', 'shear', 'subtract', 'zeroOutAxis', 'zeroOutJoints', 'zeroOutLimbs' "
-                             " 'outlier', 'rotate_all', 'rotate_rand', 'contrastive', 'None' ")
-
-    args = parser.parse_args()
-    return args
-
-
 if __name__ == '__main__':
-    args = parseargs()
-    randominit()
     dt = NTU_60_dt()
     x = dt[30]
     breakpoint()

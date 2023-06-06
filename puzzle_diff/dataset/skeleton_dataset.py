@@ -1,7 +1,7 @@
 import math
 import random
 from typing import List, Tuple
-
+import argparse
 # import albumentations
 # import cv2
 import einops
@@ -18,7 +18,7 @@ from torchvision.transforms import InterpolationMode
 from torchvision.transforms import functional as F
 
 
-class Video_dataset(pyg_data.Dataset):
+class Skeleton_dataset(pyg_data.Dataset):
     def __init__(
         self,
         dataset=None,
@@ -42,34 +42,41 @@ class Video_dataset(pyg_data.Dataset):
             raise Exception("Dataset not provided")
 
     def get(self, idx):
-        images= self.dataset_get_fn(self.dataset[idx])
-        
-        frames = torch.cat([self.transforms(img)[None, :] for img in images])
-        x = torch.linspace(-1, 1, len(frames))
+        embedding = self.dataset_get_fn(self.dataset[idx])
+        nframes=embedding[0].shape[-1]
+        #frames = torch.cat([self.transforms(img)[None, :] for img in images])
+        x = torch.linspace(-1, 1,nframes)
 
-        adj_mat = torch.ones(len(frames), len(frames))
+        adj_mat = torch.ones(nframes, nframes)
         edge_index, edge_attr = pyg.utils.dense_to_sparse(adj_mat)
 
         data = pyg_data.Data(
             x=x[:, None],
-            frames=frames,
+            original=embedding[0].permute(2,0,1),
+            perturbed=embedding[3].permute(2,0,1),
+            labels=embedding[1],
             edge_index=edge_index,
             #img_path=img_path,
             ind_name=torch.tensor([idx]).long(),
-            num_frames=torch.tensor([len(frames)]),
+            num_frames=torch.tensor([nframes]),
         )
         return data
+    
 
 
 if __name__ == "__main__":
-    from assembly_dt import Assembly_dt
-
-    train_dt = Assembly_dt()
-    dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
+    from NTU_60_1dt import NTU_60_dt
+    train_dt = NTU_60_dt()
+    dt = Skeleton_dataset(train_dt, dataset_get_fn=lambda x: x)
     dl = torch_geometric.loader.DataLoader(dt, batch_size=2)
     dl_iter = iter(dl)
+    k = next(dl_iter)
 
+   
     for i in range(5):
         k = next(dl_iter)
         print(k)
+        print(k.perturbed)
+        print(k.batch)
+        print(k.batch.unique)
     pass
