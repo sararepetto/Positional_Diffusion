@@ -17,82 +17,6 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import Compose
 import torch_geometric.loader
 
-
-class NTU_60_dt1(Dataset):
-    def __init__(self,aug='rotate',train=True):
-        super().__init__()
-        self.aug = aug
-        self.transform = aug_transform()
-        self.angle_y= random.randint(-30, 30)
-        beta = radians(self.angle_y)
-        self.rot_angle = [0, self.angle_y, 0]
-        if train == False:
-            self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/test_data_1.pt'))
-            self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/test_label_1.pt'))  
-        else:
-            self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_data_1.pt'))
-            self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_label_1.pt'))
-
-        self.N, _, _, self.T = self.data.shape
-    def __len__(self):
-        return self.N
-
-    def __getitem__(self, index):
-        data = self.data[index].permute(1, 0, 2).float().clone()  # [J, C, T]
-        data_aug = torch.empty([])
-        rot = torch.empty([])
-        if self.aug != 'None':
-            data_aug = self.transform(data.permute(1, 2, 0).unsqueeze(-1).numpy()).squeeze().permute(2, 0, 1).float()
-            if 'rotate' in self.aug:
-                rot = self.convert_rot_labels(self.rot_angle)
-        label = self.label[index].item()
-        return data, label, rot, data_aug  # [J, C, T]
-    @staticmethod
-    def collate(batch):
-        databatchTensor = torch.stack([b[0] for b in batch], dim=0)  # [S, J, C, T]
-        labelbatchTensor = torch.as_tensor([b[1] for b in batch])  # [S]
-        rotbatchTensor = torch.as_tensor([b[2] for b in batch])
-        augbatchTensor = torch.stack([b[3] for b in batch], dim=0)  # [S, J, C, T]
-        batch = {'x': databatchTensor,  # 4d tensor [bs, joints, chans, frames]
-                 'y': labelbatchTensor,  # labels of each batch sample
-                 'rot': rotbatchTensor,
-                 'aug': augbatchTensor}
-        return batch
-
-    @staticmethod
-    def convert_rot_labels(rot):
-        if rot[0] < 0:
-            rot[0] = abs(rot[0]) + 30
-        if rot[1] < 0:
-            rot[1] = abs(rot[1]) + 30
-        return rot
-
-    
-def aug_look():
-        return Gaus_noise()
-  
-class  Gaus_noise(object):
-    def __init__(self, mean=0, std=0.05):
-        self.mean = 0 if mean is None else mean
-        self.std = 0.05 if std is None else std
-
-    def __call__(self, data_numpy):
-        temp = data_numpy.copy()
-        C, T, V, M = data_numpy.shape
-        noise = np.random.normal(self.mean, self.std, size=(C, T, V, M))
-        return temp + noise
-
-class ToTensor(object):
-    def __call__(self, data_numpy):
-        return torch.from_numpy(data_numpy)
-
-def aug_transform():
-    transform_aug = []
-    augmentation = aug_look()
-    transform_aug.append(augmentation)
-    transform_aug.extend([ToTensor(), ])
-    transform_aug = Compose(transform_aug)
-    return transform_aug
 ########################################################################################################################
 class Linear(nn.Module):
     def __init__(self):
@@ -238,9 +162,6 @@ class CVAE(nn.Module):
         enc=self.encoder(data)
         output = self.decoder(data)
         return enc,output
-
-
-from pathlib import Path
 
 #/home/sara/Project/Positional_Diffusion/puzzle_diff/dataset
 if __name__ == '__main__':
