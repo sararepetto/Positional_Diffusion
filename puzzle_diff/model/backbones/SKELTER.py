@@ -3,19 +3,21 @@ import math
 import os
 import random
 import warnings
-from math import sin, cos, radians
+from math import cos, radians, sin
 from time import time
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import torch_geometric.loader
 from torch.backends import cudnn
 from torch.nn import DataParallel
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import Compose
-import torch_geometric.loader
+
 
 ########################################################################################################################
 class Linear(nn.Module):
@@ -111,14 +113,17 @@ class CVAE(nn.Module):
         self.seqTransDecoder = nn.TransformerDecoder(seqTransDecoderLayer, num_layers=self.layers)
         self.finallayer = nn.Linear(self.ls, self.input_feats)
     
-    def encoder(self, data,aug='rotate',rot_heads = False):
+    def encoder(self, data, aug='rotate',rot_heads = False):
         self.aug = aug 
         data_perturbed=data.perturbed #[S*T, J, C]
         batch = data.batch #[S]
-        x_1 = data_perturbed[batch == 0]
-        x_2 = data_perturbed[batch == 1]
-        x= torch.stack((x_1,x_2)) #[S, T, J, C]
-        x= torch.permute(x,(0,2,3,1)) #[S, J, C, T]
+        x = torch.stack(
+            [data_perturbed[batch == b]
+             for b in batch.unique()
+             ]
+        )
+
+        x  = torch.permute(x,(0,2,3,1)) #[S, J, C, T]
 
         bs, njoints, nfeats, nframes = x.shape
         ################################################################################################################

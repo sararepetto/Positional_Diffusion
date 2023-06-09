@@ -2,6 +2,8 @@ import argparse
 import math
 import os
 import random
+from math import cos, radians, sin
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -9,7 +11,6 @@ import torch.nn.functional as F
 from torch.backends import cudnn
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import Compose
-from math import sin, cos, radians
 
 
 class NTU_60_dt(Dataset):
@@ -21,11 +22,11 @@ class NTU_60_dt(Dataset):
         beta = radians(self.angle_y)
         self.rot_angle = [0, self.angle_y, 0]
         if train == False:
-            self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/test_data_1.pt'))
-            self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/test_label_1.pt'))  
+            self.data= torch.stack(torch.load('datasets/NTU_60/xview/test_data_1.pt'))
+            self.label=torch.stack(torch.load('datasets/NTU_60/xview/test_label_1.pt'))  
         else:
-            self.data= torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_data_1.pt'))
-            self.label=torch.stack(torch.load('/home/sara/Project/SKELTER/NTU/NTU_60/xview/train_label_1.pt'))
+            self.data= torch.stack(torch.load('datasets/NTU_60/xview/train_data_1.pt'))
+            self.label=torch.stack(torch.load('datasets/NTU_60/xview/train_label_1.pt'))
 
         self.N, _, _, self.T = self.data.shape
     def __len__(self):
