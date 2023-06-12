@@ -181,8 +181,8 @@ if __name__ == '__main__':
     k = next(dl_iter)
     model = DataParallel(CVAE().cuda(), device_ids=range(torch.cuda.device_count()))
     criterion = nn.CrossEntropyLoss().cuda()
-    fname_model = '/home/sara/Project/SKELTER/model/gausNoise.pt'
-    model.load_state_dict(torch.load(fname_model), strict=False)
+    # fname_model = '/home/sara/Project/SKELTER/model/gausNoise.pt'
+    # model.load_state_dict(torch.load(fname_model), strict=False)
     device='cuda'
     output=model(k.to(device))
     breakpoint()

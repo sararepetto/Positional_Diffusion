@@ -17,21 +17,6 @@ import PIL
 import pytorch_lightning as pl
 import scipy
 import timm
-
-# from .network_modules import (
-#     default,
-#     partial,
-#     SinusoidalPositionEmbeddings,
-#     PreNorm,
-#     Downsample,
-#     Upsample,
-#     Residual,
-#     LinearAttention,
-#     ConvNextBlock,
-#     ResnetBlock,
-#     Attention,
-#     exists,
-# )
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -39,6 +24,7 @@ import torch_geometric.nn.models
 import torchmetrics
 import torchvision
 import torchvision.transforms.functional as trF
+import wandb
 from kornia.geometry.transform import Rotate as krot
 from PIL import Image
 from scipy.stats import kendalltau
@@ -47,8 +33,6 @@ from torch.optim import Adam
 from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from transformers.optimization import Adafactor
-
-import wandb
 
 # from .backbones import Dark_TFConv, Eff_GAT
 from .backbones.efficient_gat_text import Eff_GAT_TEXT

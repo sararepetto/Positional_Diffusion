@@ -22,11 +22,11 @@ class NTU_60_dt(Dataset):
         beta = radians(self.angle_y)
         self.rot_angle = [0, self.angle_y, 0]
         if train == False:
-            self.data= torch.stack(torch.load('datasets/NTU_60/xview/test_data_1.pt'))
-            self.label=torch.stack(torch.load('datasets/NTU_60/xview/test_label_1.pt'))  
+            self.data= torch.stack(torch.load('datasets/NTU_60/xsub/test_data_1.pt'))
+            self.label=torch.stack(torch.load('datasets/NTU_60/xsub/test_label_1.pt'))  
         else:
-            self.data= torch.stack(torch.load('datasets/NTU_60/xview/train_data_1.pt'))
-            self.label=torch.stack(torch.load('datasets/NTU_60/xview/train_label_1.pt'))
+            self.data= torch.stack(torch.load('datasets/NTU_60/xsub/train_data_1.pt'))
+            self.label=torch.stack(torch.load('datasets/NTU_60/xsub/train_label_1.pt'))
 
         self.N, _, _, self.T = self.data.shape
     def __len__(self):
