@@ -3,6 +3,7 @@ from torchvision.datasets import CIFAR100
 from .celeba_dt import CelebA_HQ
 from .nips_dt import Nips_dt
 from .NTU_60_dt import NTU_60_dt
+from .skeletics_dt import Skeletics_dt
 from .puzzle_dataset import Puzzle_Dataset, Puzzle_Dataset_MP, Puzzle_Dataset_ROT
 from .roc_dt import Roc_dt
 from .sind_dt import Sind_dt
@@ -278,13 +279,18 @@ def get_dataset_vist(dataset: str):
 
 def get_dataset_skeletons(dataset: str):
     if dataset == 'ntu':
-        train_dt = NTU_60_dt(train='True')
-        test_dt = NTU_60_dt(train='False')
+        train_dt = NTU_60_dt(train = True)
+        test_dt = NTU_60_dt(train = False)
+    if dataset == 'skeletics':
+        train_dt = Skeletics_dt(train= True)
+        test_dt = Skeletics_dt(train= False)
+
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
 
     train_dt = Skeleton_dataset(train_dt, dataset_get_fn=lambda x: x)
     val_dt = Skeleton_dataset(test_dt, dataset_get_fn=lambda x: x)
     test_dt = Skeleton_dataset(test_dt, dataset_get_fn=lambda x: x)
+
 
     return train_dt, val_dt, test_dt

@@ -28,7 +28,7 @@ class Eff_GAT_Skeletons(nn.Module):
 
         self.backbone = CVAE()
         fname_model = './gausNoise.pt'
-        self.backbone.load_state_dict(torch.load(fname_model), strict=False)
+        #self.backbone.load_state_dict(torch.load(fname_model), strict=False)
 
         self.combined_features_dim = 256 + 32 + 32
         self.gnn_backbone = Transformer_GNN(

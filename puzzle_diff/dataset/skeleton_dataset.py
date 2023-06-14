@@ -66,8 +66,9 @@ class Skeleton_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from NTU_60_1dt import NTU_60_dt
-    train_dt = NTU_60_dt()
+    from NTU_60_dt import NTU_60_dt
+    from skeletics_dt import Skeletics_dt
+    train_dt = Skeletics_dt()
     dt = Skeleton_dataset(train_dt, dataset_get_fn=lambda x: x)
     dl = torch_geometric.loader.DataLoader(dt, batch_size=2)
     dl_iter = iter(dl)
@@ -76,6 +77,7 @@ if __name__ == "__main__":
    
     for i in range(5):
         k = next(dl_iter)
+        breakpoint()
         print(k)
         print(k.perturbed)
         print(k.batch)

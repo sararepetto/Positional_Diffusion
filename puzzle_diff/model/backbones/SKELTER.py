@@ -172,7 +172,7 @@ class CVAE(nn.Module):
 if __name__ == '__main__':
     import sys 
     sys.path.append('/home/sara/Project/Positional_Diffusion/puzzle_diff/dataset')
-    from NTU_60_1dt import NTU_60_dt
+    from NTU_60_dt import NTU_60_dt
     from skeleton_dataset import Skeleton_dataset
     train_dt = NTU_60_dt()
     dt = Skeleton_dataset(train_dt, dataset_get_fn=lambda x: x)
