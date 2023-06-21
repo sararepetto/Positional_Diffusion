@@ -18,7 +18,7 @@ class Skeletics_dt(Dataset):
     def __getitem__(self, index):
         data = self.data[index].permute(1, 0, 2).float().clone()
         label = self.label[index]
-        return data, label, None, data
+        return data, label, data
 
 
 if __name__ == '__main__':

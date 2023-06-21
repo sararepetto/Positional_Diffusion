@@ -54,7 +54,7 @@ class Skeleton_dataset(pyg_data.Dataset):
         data = pyg_data.Data(
             x=x[:, None],
             original=embedding[0].permute(2,0,1),
-            perturbed=embedding[3].permute(2,0,1),
+            perturbed=embedding[2].permute(2,0,1),
             labels=embedding[1],
             edge_index=edge_index,
             #img_path=img_path,

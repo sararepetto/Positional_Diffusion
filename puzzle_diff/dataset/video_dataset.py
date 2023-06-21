@@ -62,9 +62,9 @@ class Video_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from assembly_dt import Assembly_dt
+    from ntu_RGB_dt import ntu_RGB_dt
 
-    train_dt = Assembly_dt()
+    train_dt = ntu_RGB_dt()
     dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
     dl = torch_geometric.loader.DataLoader(dt, batch_size=2)
     dl_iter = iter(dl)

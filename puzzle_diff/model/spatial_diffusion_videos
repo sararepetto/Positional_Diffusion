@@ -36,7 +36,7 @@ from transformers.optimization import Adafactor
 import wandb
 
 # from .backbones import Dark_TFConv, Eff_GAT
-from .backbones.efficient_gat_skeletons import Eff_GAT_Skeletons
+from .backbones.efficient_gat import Eff_GAT
 
 matplotlib.use("agg")
 
@@ -205,7 +205,7 @@ class GNN_Diffusion(pl.LightningModule):
 
         ### BACKBONE
         #self.model = Eff_GAT_TEXT(steps=steps, input_channels=1, output_channels=1)
-        self.model = Eff_GAT_Skeletons(steps=steps, input_channels=1, output_channels=1)
+        self.model = Eff_GAT(steps=steps, input_channels=1, output_channels=1)
         self.save_hyperparameters()
 
     def initialize_torchmetrics(self):
@@ -217,31 +217,23 @@ class GNN_Diffusion(pl.LightningModule):
         metrics["overall_nImages"] = torchmetrics.SumMetric()
         self.metrics = nn.ModuleDict(metrics)
 
-    def forward(self, xy_pos, time, skeletons, edge_index, batch) -> Any:
-        return self.model.forward(xy_pos, time, skeletons, edge_index, batch)
+    def forward(self, xy_pos, time, rgb_frames, edge_index, batch) -> Any:
+        return self.model.forward(xy_pos, time, rgb_frames, edge_index, batch)
 
     def forward_with_feats(
         self,
         xy_pos: Tensor,
         time: Tensor,
-        skeletons_feats: Tensor,
+        video_feats: Tensor,
         edge_index: Tensor,
         batch,
     ) -> Any:
         return self.model.forward_with_feats(
-            xy_pos, time, skeletons_feats, edge_index, batch
+            xy_pos, time, video_feats, edge_index, batch
         )
 
-    def skeleton_features(self, skeletons, xy_pos):
-        new_positions=[]
-        for i in range(skeletons.batch.max() + 1):
-                pos = xy_pos[skeletons.batch == i]
-                new_idx=torch.argsort(pos.squeeze())
-                new_positions.append(new_idx)
-                
-                
-        new_positions = torch.stack(new_positions)
-        return self.model.skeleton_features(skeletons.original, skeletons.batch,new_positions)
+    def video_features(self, rgb_frames):
+        return self.model.visual_features(rgb_frames)
 
     # forward diffusion
     def q_sample(self, x_start, t, noise=None):
@@ -262,7 +254,7 @@ class GNN_Diffusion(pl.LightningModule):
         t,
         noise=None,
         loss_type="l1",
-        skeletons=None,
+        rgb_frames=None,
         edge_index=None,
         batch=None,
     ):
@@ -274,12 +266,12 @@ class GNN_Diffusion(pl.LightningModule):
         else:
             x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
 
-        skeletons_feats = self.skeleton_features(skeletons,x_noisy)
+        video_feats = self.video_features(rgb_frames)
 
         prediction = self.forward_with_feats(
             x_noisy,
             t,
-            skeletons_feats,
+            video_feats,
             edge_index,
             batch=batch,
         ) # predicted x_0 and compare to gt x_0
@@ -301,7 +293,7 @@ class GNN_Diffusion(pl.LightningModule):
         return loss
 
     @torch.no_grad()
-    def p_sample_ddpm(self, x, t, t_index, cond, edge_index, patch_feats, batch):
+    def p_sample_ddpm(self, x, t, t_index, cond, edge_index, video_feats, batch):
         betas_t = extract(self.betas, t, x.shape)
         sqrt_one_minus_alphas_cumprod_t = extract(
             self.sqrt_one_minus_alphas_cumprod, t, x.shape
@@ -314,7 +306,7 @@ class GNN_Diffusion(pl.LightningModule):
             x
             - betas_t
             * self.forward_with_feats(
-                x, t, cond, edge_index, patch_feats=patch_feats, batch=batch
+                x, t, cond, edge_index, video_feats = video_feats, batch=batch
             )
             / sqrt_one_minus_alphas_cumprod_t
         )
@@ -365,7 +357,7 @@ class GNN_Diffusion(pl.LightningModule):
 
     @torch.no_grad()
     def p_sample_ddim(
-        self, x, t, t_index, cond, edge_index, skeleton_feats, batch
+        self, x, t, t_index, cond, edge_index, video_feats, batch
     ):  
 
         prev_timestep = t - self.inference_ratio
@@ -382,7 +374,7 @@ class GNN_Diffusion(pl.LightningModule):
         beta_prev = 1 - alpha_prod_prev
 
         model_output = self.forward_with_feats(
-                x, t, edge_index=edge_index, skeletons_feats=skeleton_feats, batch=batch
+                x, t, edge_index=edge_index, video_feats= video_feats, batch=batch
             )
 
         # estimate x_0
@@ -428,7 +420,7 @@ class GNN_Diffusion(pl.LightningModule):
 
         xs = []
 
-        skeleton_feats = self.skeleton_features(cond,x)
+        video_feats = self.video_features(cond)
 
         for i in tqdm(
             list(reversed(range(0, self.steps, self.inference_ratio))),
@@ -441,7 +433,7 @@ class GNN_Diffusion(pl.LightningModule):
                 i,
                 cond=cond,
                 edge_index=edge_index,
-                feats=skeleton_feats,
+                feats=video_feats,
                 batch=batch,
             )
             
@@ -486,7 +478,7 @@ class GNN_Diffusion(pl.LightningModule):
             batch.x,
             new_t,
             loss_type="huber",
-            skeletons=batch,
+            rgb_frames=batch,
             edge_index=batch.edge_index,
             batch=batch.batch,
         )

@@ -19,7 +19,7 @@ class Assembly_dt(Dataset):
     def __getitem__(self,idx):
         
         element=self.list_files[idx]
-        video_path=f"/home/sara/Downloads/Online/RGB/{element}"
+        video_path=f"/home/sara/Downloads/Online/RGB/{element}" #cosi dovrebbe andare
         video=[]
         cap = cv2.VideoCapture(video_path)
         index = 0

@@ -4,8 +4,7 @@ import timm
 import torch
 import torch.nn as nn
 from torch import Tensor
-
-from .SKELTER import CVAE
+from .Skelter_original import CVAE
 from .Transformer_GNN import Transformer_GNN
 
 
@@ -91,9 +90,9 @@ class Eff_GAT_Skeletons(nn.Module):
 
         return output
 
-    def skeleton_features(self, skeletons):
+    def skeleton_features(self, skeletons,batch,positions):
         
-        skeleton_features = self.backbone.encoder(skeletons)['embedding']
+        skeleton_features = self.backbone.encoder(skeletons,batch,positions )['embedding']
         batch_size_t = math.prod(skeleton_features.shape[:2])
         skeleton_features = skeleton_features.permute(1, 0, 2).reshape(batch_size_t, -1)
         return skeleton_features
