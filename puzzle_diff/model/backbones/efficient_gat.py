@@ -20,13 +20,13 @@ class Eff_GAT(nn.Module):
         super().__init__()
 
         self.visual_backbone = timm.create_model(
-            "efficientnet_b0", pretrained=True, features_only=True
+            "efficientnet_b0", pretrained= False, features_only=True
         )
         self.input_channels = input_channels
         self.output_channels = output_channels
         # visual_feats = 448  # hardcoded
 
-        self.combined_features_dim = 1088 + 32 + 32
+        self.combined_features_dim = 4656 + 32 + 32 #visual features + pos_feats + temp_feats
 
         # self.gnn_backbone = torch_geometric.nn.models.GAT(
         #     in_channels=self.combined_features_dim,
@@ -68,7 +68,7 @@ class Eff_GAT(nn.Module):
         # patch_rgb.shape[0], -1
         # )
         # patch_feats = patch_feats
-
+        #breakpoint() 
         patch_feats = self.visual_features(patch_rgb)
         final_feats = self.forward_with_feats(
             xy_pos, time, patch_rgb, edge_index, patch_feats=patch_feats, batch=batch
@@ -79,7 +79,6 @@ class Eff_GAT(nn.Module):
         self: nn.Module,
         xy_pos: Tensor,
         time: Tensor,
-        patch_rgb: Tensor,
         edge_index: Tensor,
         patch_feats: Tensor,
         batch,
@@ -90,7 +89,6 @@ class Eff_GAT(nn.Module):
         # COMBINE  and transform with MLP
         combined_feats = torch.cat([patch_feats, pos_feats, time_feats], -1)
         combined_feats = self.mlp(combined_feats)
-
         # GNN
         feats = self.gnn_backbone(x=combined_feats, edge_index=edge_index)
 

@@ -13,7 +13,7 @@ import string
 
 import pytorch_lightning as pl
 from dataset.dataset_utils import get_dataset_videos
-from model import spatial_diffusion_skeletons as sd
+from model import spatial_diffusion_videos as sd 
 from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
 

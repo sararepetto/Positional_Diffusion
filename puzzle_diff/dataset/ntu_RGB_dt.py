@@ -37,23 +37,18 @@ class ntu_RGB_dt(Dataset):
                 break
         cap.release()
         for i in range(len(video)):
-            #video[i]= video[i][360:,750:1200]
            video[i] = cv2.cvtColor(video[i], cv2.COLOR_BGR2RGB)
-      #      breakpoint()
-           video[i]=cv2.resize(video[i],(64,64))
+           #video[i] = cv2.resize(video[i],(64,64))
+           #video[i] = cv2.resize(video[i],(int((video[i].shape[1])/24), int((video[i].shape[0])/24)))
+           video[i] = cv2.resize(video[i],(int((video[i].shape[1])/10), int((video[i].shape[0])/10)))
         return video
 
 if __name__ == "__main__":
         dt = ntu_RGB_dt()
         breakpoint()
         frames=0
-        #for i in range (len(dt)): 
-            #x=dt[i]
-            #if len(x) > frames:
-                #frames = len(x)
-        #breakpoint()
         x= dt[30]
-        print(len(x))
+        print(x[0].shape)
         plt.figure()
         plt.imshow(x[50])
         plt.show()

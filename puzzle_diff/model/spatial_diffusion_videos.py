@@ -224,12 +224,12 @@ class GNN_Diffusion(pl.LightningModule):
         self,
         xy_pos: Tensor,
         time: Tensor,
-        video_feats: Tensor,
         edge_index: Tensor,
+        video_feats: Tensor,
         batch,
     ) -> Any:
         return self.model.forward_with_feats(
-            xy_pos, time, video_feats, edge_index, batch
+            xy_pos, time, edge_index, video_feats, batch
         )
 
     def video_features(self, rgb_frames):
@@ -271,8 +271,8 @@ class GNN_Diffusion(pl.LightningModule):
         prediction = self.forward_with_feats(
             x_noisy,
             t,
-            video_feats,
             edge_index,
+            video_feats,
             batch=batch,
         ) # predicted x_0 and compare to gt x_0
 
@@ -293,7 +293,7 @@ class GNN_Diffusion(pl.LightningModule):
         return loss
 
     @torch.no_grad()
-    def p_sample_ddpm(self, x, t, t_index, cond, edge_index, video_feats, batch):
+    def p_sample_ddpm(self, x, t, t_index, cond,edge_index, video_feats, batch):
         betas_t = extract(self.betas, t, x.shape)
         sqrt_one_minus_alphas_cumprod_t = extract(
             self.sqrt_one_minus_alphas_cumprod, t, x.shape
@@ -306,7 +306,7 @@ class GNN_Diffusion(pl.LightningModule):
             x
             - betas_t
             * self.forward_with_feats(
-                x, t, cond, edge_index, video_feats = video_feats, batch=batch
+                x, t, edge_index, video_feats = video_feats, batch=batch
             )
             / sqrt_one_minus_alphas_cumprod_t
         )
@@ -413,7 +413,6 @@ class GNN_Diffusion(pl.LightningModule):
     def p_sample_loop(self, shape, cond, edge_index, batch):
         # device = next(model.parameters()).device
         device = self.device
-
         b = shape[0]
         # start from pure noise (for each example in the batch)
         x = torch.randn(shape, device=device) * self.noise_weight
@@ -478,11 +477,10 @@ class GNN_Diffusion(pl.LightningModule):
             batch.x,
             new_t,
             loss_type="huber",
-            rgb_frames=batch,
+            rgb_frames=batch.frames,
             edge_index=batch.edge_index,
             batch=batch.batch,
         )
-
         self.log("loss", loss)
 
         return loss
@@ -490,7 +488,7 @@ class GNN_Diffusion(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         with torch.no_grad():
             xs = self.p_sample_loop(
-                batch.x.shape, batch, batch.edge_index, batch=batch.batch
+                batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
             )
             
             x = xs[-1]

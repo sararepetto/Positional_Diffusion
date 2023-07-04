@@ -66,6 +66,7 @@ class Skeleton_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
+    
     from NTU_60_dt import NTU_60_dt
     from skeletics_dt import Skeletics_dt
     train_dt = Skeletics_dt()
