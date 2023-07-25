@@ -22,36 +22,29 @@ class Body(object):
 
     def __call__(self, oriImg):
         # scale_search = [0.5, 1.0, 1.5, 2.0]
-        scale_search = [0.5]
+        scale = 0.5
         boxsize = 368
         stride = 8
         padValue = 128
         thre1 = 0.1
         thre2 = 0.05
-        multiplier = [x * boxsize / oriImg.shape[1] for x in scale_search]
+        multiplier = scale * boxsize / oriImg.shape[1] 
         heatmap_avg = np.zeros((oriImg.shape[1], oriImg.shape[2], 19))
         paf_avg = np.zeros((oriImg.shape[1], oriImg.shape[2], 38))
         
-        for m in range(len(multiplier)):
-            scale = multiplier[m]
-            new = []
-            for i in range(oriImg.shape[0]):
-                imageToTest = cv2.resize(oriImg[i], (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-                imageToTest_padded, pad = util.padRightDownCorner(imageToTest, stride, padValue)
-                im = np.transpose(np.float32(imageToTest_padded), (2, 0, 1)) / 256 - 0.5
-                #im = np.transpose(np.float32(imageToTest_padded[:, :, :, np.newaxis]), (3, 2, 0, 1)) / 256 - 0.5
-                im = np.ascontiguousarray(im)
-                im = torch.from_numpy(im)
-                #breakpoint()
+        
+            #scale = multiplier[m]
+        new = []
+        for i in range(oriImg.shape[0]):
+                im = torch.from_numpy(oriImg[i])
                 new.append(im)
-            data = torch.stack(new).float()
-            if torch.cuda.is_available():
+        data = torch.stack(new).float()
+        if torch.cuda.is_available():
                 data = data.cuda()
-            # data = data.permute([2, 0, 1]).unsqueeze(0).float()
-    
-            Mconv7_stage6_L1, Mconv7_stage6_L2 = self.model(data)
-            Mconv7_stage6_L1 = Mconv7_stage6_L1.detach().cpu().numpy()
-            Mconv7_stage6_L2 = Mconv7_stage6_L2.detach().cpu().numpy()
+        with torch.no_grad():#da capire con il finetuning come funziona, togliendo torch.no_grad
+                Mconv7_stage6_L1, Mconv7_stage6_L2 = self.model(data)
+                Mconv7_stage6_L1 = Mconv7_stage6_L1.detach().cpu().numpy()
+        Mconv7_stage6_L2 = Mconv7_stage6_L2.detach().cpu().numpy()
            
 
         return  Mconv7_stage6_L2

@@ -12,7 +12,7 @@ import random
 import string
 
 import pytorch_lightning as pl
-from dataset.dataset_utils import get_dataset_videos
+from dataset.dataset_utils import get_dataset_pose
 from model import spatial_diffusion_open as sd 
 from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
@@ -41,7 +41,7 @@ def main(
 ):
     ### Define dataset
 
-    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset)
+    train_dt, val_dt, test_dt = get_dataset_pose(dataset=dataset)
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
@@ -72,7 +72,7 @@ def main(
     tags = [f"{dataset}", "video", "train"]
 
     wandb_logger = WandbLogger(
-        project="Video-Diff",
+        project="POSE-Diff",
         settings=wandb.Settings(code_dir="."),
         offline=offline,
         name=experiment_name,
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     ap.add_argument("-gpus", type=int, default=1)
     ap.add_argument("-steps", type=int, default=100)
     ap.add_argument("-num_workers", type=int, default=8)
-    ap.add_argument("-dataset", default="ntu", choices=["ntu"])
+    ap.add_argument("-dataset", default="ntu", choices=["ntu","pennaction"])
     ap.add_argument("-sampling", default="DDIM", choices=["DDPM", "DDIM"])
     ap.add_argument("-inference_ratio", type=int, default=10)
     ap.add_argument("--offline", action="store_true", default=False)

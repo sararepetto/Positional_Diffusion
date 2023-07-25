@@ -90,18 +90,20 @@ def main(
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
     )
-    trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
 
+    trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
+    #trainer.test()
+    
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-
+    
     # Add the arguments to the parser
     ap.add_argument("-batch_size", type=int, default=6)
     ap.add_argument("-gpus", type=int, default=1)
     ap.add_argument("-steps", type=int, default=100)
     ap.add_argument("-num_workers", type=int, default=8)
-    ap.add_argument("-dataset", default="ntu", choices=["ntu"])
+    ap.add_argument("-dataset", default="ntu", choices=["ntu","pennaction"])
     ap.add_argument("-sampling", default="DDIM", choices=["DDPM", "DDIM"])
     ap.add_argument("-inference_ratio", type=int, default=10)
     ap.add_argument("--offline", action="store_true", default=False)

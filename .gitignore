@@ -8,7 +8,7 @@ dataset_old_delete/
 .vscode/
 wandb/
 singularity/*.o*
-
+PT_OpenPose
 *.png
 *.ckpt
 *.sif

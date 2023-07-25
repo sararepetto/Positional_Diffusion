@@ -2,6 +2,7 @@ import colorsys
 import enum
 import math
 import pickle
+import cv2
 
 # from .backbones.Transformer_GNN import Transformer_GNN
 from collections import defaultdict
@@ -481,6 +482,26 @@ class GNN_Diffusion(pl.LightningModule):
             edge_index=batch.edge_index,
             batch=batch.batch,
         )
+
+        if batch_idx == 0 and self.local_rank == 0:
+            imgs = self.p_sample_loop(
+                batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
+            )
+            img = imgs[-1]
+            save_path = Path(f"results/{self.logger.experiment.name}/train")
+            for i in range(
+                min(batch.batch.max().item(), 2)
+            ):  # save max 2 videos during training loop
+                idx = torch.where(batch.batch == i)[0]
+                frames_rgb = batch.frames[idx]
+                gt_pos = batch.x[idx]
+                pos = img[idx]
+                self.save_video(frames_rgb=frames_rgb,
+                        pos=pos,
+                        gt_pos=gt_pos,
+                        file_name=save_path,
+                    )
+
         self.log("loss", loss)
 
         return loss
@@ -526,6 +547,26 @@ class GNN_Diffusion(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self.validation_step(batch, batch_idx)
+      
+    def save_video(self,
+        frames_rgb,
+        pos,
+        gt_pos,
+        file_name: Path,
+        ):
+        new_frames=frames_rgb[torch.argsort(pos.squeeze()).cpu().numpy()].detach().cpu().numpy()
+        new_frames = cv2.normalize(new_frames, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
+        videos = wandb.Video(new_frames, fps = 1)
+        self.logger.experiment.log(
+            {f"{file_name.stem}/{self.current_epoch}": videos, "global_step": self.global_step}
+        )
+        writer = cv2.VideoWriter(f"{file_name}/asd_{self.current_epoch}.avi",cv2.VideoWriter_fourcc(*"MJPG"), 30,(128,128))
+        for frame in range(len(new_frames)):
+            writer.write(frame)
+        writer.release()
+    
+
+
 
 def kendall_tau(order, ground_truth):
     """
@@ -542,11 +583,10 @@ def kendall_tau(order, ground_truth):
     if len(ground_truth) == 1:
         if ground_truth[0] == order[0]:
             return 1.0
-
     reorder_dict = {}
 
     for i in range(len(ground_truth)):
-        reorder_dict[ground_truth[i]] = i
+        reorder_dict[ground_truth[i].item()] = i
 
     new_order = [0] * len(order)
     for i in range(len(new_order)):

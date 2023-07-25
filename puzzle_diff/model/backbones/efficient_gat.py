@@ -18,7 +18,6 @@ class Eff_GAT(nn.Module):
 
     def __init__(self, steps, input_channels=2, output_channels=2) -> None:
         super().__init__()
-
         self.visual_backbone = timm.create_model(
             "efficientnet_b0", pretrained= False, features_only=True
         )
@@ -26,7 +25,7 @@ class Eff_GAT(nn.Module):
         self.output_channels = output_channels
         # visual_feats = 448  # hardcoded
 
-        self.combined_features_dim = 4656 + 32 + 32 #visual features + pos_feats + temp_feats
+        self.combined_features_dim = 4352 + 32 + 32 #visual features + pos_feats + temp_feats
 
         # self.gnn_backbone = torch_geometric.nn.models.GAT(
         #     in_channels=self.combined_features_dim,
@@ -59,7 +58,6 @@ class Eff_GAT(nn.Module):
         std = torch.tensor([0.2290, 0.2240, 0.2250])[None, :, None, None]
         self.register_buffer("mean", mean)
         self.register_buffer("std", std)
-
     def forward(self, xy_pos, time, patch_rgb, edge_index, batch):
         # patch_rgb = (patch_rgb - self.mean) / self.std
 
@@ -68,7 +66,6 @@ class Eff_GAT(nn.Module):
         # patch_rgb.shape[0], -1
         # )
         # patch_feats = patch_feats
-        #breakpoint() 
         patch_feats = self.visual_features(patch_rgb)
         final_feats = self.forward_with_feats(
             xy_pos, time, patch_rgb, edge_index, patch_feats=patch_feats, batch=batch
@@ -91,15 +88,19 @@ class Eff_GAT(nn.Module):
         combined_feats = self.mlp(combined_feats)
         # GNN
         feats = self.gnn_backbone(x=combined_feats, edge_index=edge_index)
+        #una feature per ogni frames
+        #mean per video
 
         # Residual + final transform
         final_feats = self.final_mlp(
             feats + combined_feats
         )  # combined -> (err_x, err_y)
-
+        #posizione
         return final_feats
+        
 
     def visual_features(self, patch_rgb):
+        #patch_rgb = patch_rgb.permute(0,3,1,2)
         patch_rgb = (patch_rgb - self.mean) / self.std
 
         feats = self.visual_backbone.forward(patch_rgb)

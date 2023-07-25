@@ -3,6 +3,7 @@ from torchvision.datasets import CIFAR100
 from .celeba_dt import CelebA_HQ
 from .nips_dt import Nips_dt
 from .ntu_RGB_dt import ntu_RGB_dt
+from .ntu_POSE_dt import ntu_POSE_dt
 from .NTU_60_dt import NTU_60_dt
 from .skeletics_dt import Skeletics_dt 
 from .puzzle_dataset import Puzzle_Dataset, Puzzle_Dataset_MP, Puzzle_Dataset_ROT
@@ -15,7 +16,8 @@ from .text_dataset import Text_dataset
 from .vist_dataset import Vist_dataset
 from .wiki_dt import Wiki_dt
 from .wikiart_dt import Wikiart_DT
-
+from .PennAction_RGB_dt import PennAction_RGB_dt
+from .PennAction_POSE_dt import PennAction_POSE_dt
 ALLOWED_DT = ["celeba", "cifar100", "wikiart"]
 ALLOWED_TEXT = ["nips", "sind", "roc", "wiki"]
 
@@ -301,6 +303,9 @@ def get_dataset_videos(dataset:str):
     if dataset == 'ntu':
         train_dt = ntu_RGB_dt(train = True)
         test_dt = ntu_RGB_dt(train = True)
+    elif dataset == 'pennaction':
+        train_dt = PennAction_RGB_dt(train = True)
+        test_dt = PennAction_RGB_dt(train = True)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
@@ -309,3 +314,20 @@ def get_dataset_videos(dataset:str):
     test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
  
     return train_dt, val_dt, test_dt
+
+def get_dataset_pose(dataset:str):
+    if dataset == 'ntu':
+        train_dt = ntu_POSE_dt(train = True)
+        test_dt = ntu_POSE_dt(train = True)
+    elif dataset == 'pennaction':
+        train_dt = PennAction_POSE_dt(train = True)
+        test_dt = PennAction_POSE_dt(train = True)
+    else:
+        raise Exception(f"Dataset {dataset} is not provided.")
+    
+    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
+    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
+    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
+ 
+    return train_dt, val_dt, test_dt
+

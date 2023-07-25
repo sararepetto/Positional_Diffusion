@@ -26,8 +26,8 @@ class Eff_GAT_POSE(nn.Module):
         self.output_channels = output_channels
         # visual_feats = 448  # hardcoded
 
-        self.combined_features_dim = 11316 + 32 + 32
-        self.output_feature_dimension = 11376
+        self.combined_features_dim = 256 + 32 + 32
+        #self.output_feature_dimension = 11376
         
          #visual features + pos_feats + temp_feats
 
@@ -40,12 +40,12 @@ class Eff_GAT_POSE(nn.Module):
         self.conv = nn.Conv2d(19,12,1)
 
         self.gnn_backbone = Transformer_GNN(
-            self.output_feature_dimension,
-            #self.combined_features_dim,
+            #self.output_feature_dimension,
+            self.combined_features_dim,
             hidden_dim=32 * 8,
             heads=8,
-            #output_size = self.combined_features_dim,
-            output_size=self.output_feature_dimension,
+            output_size = self.combined_features_dim,
+            #output_size=self.output_feature_dimension,
         )
         self.time_emb = nn.Embedding(steps, 32)
         self.pos_mlp = nn.Sequential(
@@ -55,12 +55,12 @@ class Eff_GAT_POSE(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(self.combined_features_dim, 128),
             nn.GELU(),
-            #nn.Linear(128, self.combined_features_dim),
-            nn.Linear(128, self.output_feature_dimension),
+            nn.Linear(128, self.combined_features_dim),
+            #nn.Linear(128, self.output_feature_dimension),
         )
         self.final_mlp = nn.Sequential(
-            #nn.Linear(self.combined_features_dim,32),
-            nn.Linear(self.output_feature_dimension, 32),
+            nn.Linear(self.combined_features_dim,32),
+            #nn.Linear(self.output_feature_dimension, 32),
             nn.GELU(),
             nn.Linear(32, output_channels),
         )
@@ -112,22 +112,9 @@ class Eff_GAT_POSE(nn.Module):
         return final_feats
 
     def visual_features(self, patch_rgb):
-        #patch_rgb = (patch_rgb - self.mean) / self.std
-
         feats = self.visual_backbone.forward(patch_rgb)
         feats = feats.to('cuda:0')
-        feats = self.conv(feats)
+        #feats = self.conv(feats)
         feats = torch.flatten(feats, start_dim =1)
-        #breakpoint()
-        #patch_feats = torch.cat(
-            #[
-               # feats[2].reshape(patch_rgb.shape[0], -1),
-               # feats[3].reshape(patch_rgb.shape[0], -1),
-           # ],
-           # -1,
-        #)
-
-        # patch_feats = self.visual_backbone.forward(patch_rgb)[3].reshape(
-        # patch_rgb.shape[0], -1
-        # )
+        
         return feats

@@ -1,0 +1,42 @@
+from pathlib import Path
+from PIL import Image
+from torch.utils.data import Dataset
+from matplotlib import pyplot as plt
+import cv2
+import os
+import numpy as np
+import torch
+import skvideo.io
+from skimage.transform import resize
+import scipy.io
+
+
+data_path = Path('/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames')
+list_files= sorted(os.listdir(data_path))
+zero= 0
+for i in range(len(list_files)):
+        element=list_files[i]
+        video_path=f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{element}"
+        video=[]
+        imgs = sorted(os.listdir(video_path))
+        labels = scipy.io.loadmat(f'/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/labels/{element}.mat')
+        x_coordinates = labels ['x']
+        y_coordinates = labels['y']
+        bbox = labels['bbox']
+        for i in range(len(imgs)-1):
+            image = cv2.imread(f'/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{element}/{imgs[i]}')
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            xmin = np.min(x_coordinates[i]) #- min(np.min(x_coordinates[i]),20)
+            xmax = np.max(x_coordinates[i])#+ min((image.shape[1]-np.max(x_coordinates[i])),20)
+            ymin = np.min(y_coordinates[i]) #- min(np.min(y_coordinates[i]),20)
+            ymax = np.max (y_coordinates[i])# + min((image.shape[1]-np.max(x_coordinates[i])),20)
+            X_min ,Y_min,X_max,Y_max= bbox[i]
+            image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
+            print(i)
+            print(image.shape)
+            if image.shape == (0,0,3):
+                 zero += 1
+print(zero)
+            
+          #184 frames senza le bounding boxe 
+          #
