@@ -127,6 +127,7 @@ class MLP_action(pl.LightningModule):
         self,
         steps=600,
         inference_ratio=1,
+        model_mean_type: ModelMeanType = ModelMeanType.EPSILON,
         learning_rate=1e-4,
         sampling="DDPM",
         save_and_sample_every=1000,
@@ -140,6 +141,7 @@ class MLP_action(pl.LightningModule):
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
+        self.model_mean_type = model_mean_type
         self.learning_rate = learning_rate
         self.save_and_sample_every = save_and_sample_every
         self.noise_weight = noise_weight
@@ -204,7 +206,7 @@ class MLP_action(pl.LightningModule):
         self.steps = steps
        
         ### BACKBONE
-        self.model = MLP(steps=steps, input_dim=1, output_dim=1)
+        self.model = MLP(steps=steps, input_dim = 4416, num_classes = 15) 
         self.save_hyperparameters()
 
     def initialize_torchmetrics(self):
@@ -264,13 +266,12 @@ class MLP_action(pl.LightningModule):
         prediction = self.forward(
             x_noisy,
             t,
-            edge_index,
             rgb_frames,
+            edge_index,
             batch=batch,
         ) # predicted action and compare to the real one
-
         if loss_type == "CE":
-            loss = nn.CrossEntropyLoss(target, prediction)
+            loss = F.cross_entropy(prediction,target)
         else:
             raise NotImplementedError()
 
@@ -416,17 +417,21 @@ class MLP_action(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx, noise = None):
         with torch.no_grad():
+            batch_size = batch.batch.max().item() + 1
+            t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
+            new_t = torch.gather(t, 0, batch.batch)
+
             if noise is None:
                 noise = torch.randn_like(batch.x)
 
             if self.steps == 1:
                 x_noisy = torch.zeros_like(batch.x)
             else:
-                x_noisy = self.q_sample(x_start=batch.x, t=t, noise=noise)
+                x_noisy = self.q_sample(x_start=batch.x, t=new_t, noise=noise)
 
             batch_size = batch.batch.max().item() + 1
             t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
-            new_t = torch.gather(t, 0, batch.batch)
+        
             action = self.forward(
             x_noisy ,
             new_t,
@@ -434,19 +439,17 @@ class MLP_action(pl.LightningModule):
             rgb_frames=batch.frames,
             batch=batch.batch,
         ) 
-            #breakpoint()
             n = 0
             for i in range(batch.batch.max() + 1):
                 pred=torch.nn.functional.softmax(action, dim= -1)
-                pred=torch.max(pred.data, 1)
-                breakpoint()
-                pred = pred[batch.batch == i]
+              
+                pred=torch.argmax(pred,dim=-1)
+                pred = pred[i]
                 device = pred.device
                 # Saving entire diff process
                 n += 1
-                gt = batch.action[batch.batch == i].to(device)
-                self.metrics["overall_nImages"].update(1)
-
+                gt = batch.action[i].to(device)
+        
                 match = (pred == gt).to(
                     batch.action.device
                 )

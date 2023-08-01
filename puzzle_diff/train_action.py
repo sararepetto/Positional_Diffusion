@@ -53,7 +53,7 @@ def main(
     epoch_steps = len(dl_train) * 10
     max_steps = len(dl_train) * 100
 
-    model = ad.GNN_Diffusion(
+    model = ad.MLP_action(
         steps=steps,
         sampling=sampling,
         inference_ratio=inference_ratio,

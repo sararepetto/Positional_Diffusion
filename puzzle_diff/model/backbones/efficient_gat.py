@@ -82,7 +82,6 @@ class Eff_GAT(nn.Module):
     ):
         time_feats = self.time_emb(time)  # embedding, int -> 32
         pos_feats = self.pos_mlp(xy_pos)  # MLP, (x, y) -> 32
-
         # COMBINE  and transform with MLP
         combined_feats = torch.cat([patch_feats, pos_feats, time_feats], -1)
         combined_feats = self.mlp(combined_feats)

@@ -36,8 +36,10 @@ def main(
     sampling,
     inference_ratio,
     offline,
+    noise_weight,
     checkpoint_path,
     predict_xstart,
+    evaluate
 ):
     ### Define dataset
 
@@ -62,7 +64,7 @@ def main(
         else sd.ModelMeanType.START_X,
         warmup_steps=epoch_steps,
         max_train_steps=max_steps,
-        noise_weight=1
+        noise_weight=noise_weight
     )
     model.initialize_torchmetrics()
 
@@ -90,8 +92,14 @@ def main(
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
     )
-
-    trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
+    if evaluate:
+        model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
+        model.initialize_torchmetrics()
+        model.noise_weight = noise_weight
+        trainer.test(model, dl_test)
+    else:
+        trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
+   
     #trainer.test()
     
 
@@ -109,7 +117,9 @@ if __name__ == "__main__":
     ap.add_argument("--offline", action="store_true", default=False)
     ap.add_argument("--checkpoint_path", type=str, default="")
     ap.add_argument("--predict_xstart", type=bool, default=True)
-    
+    ap.add_argument("--evaluate", type=bool, default=False)
+    ap.add_argument("--noise_weight", type=float, default=0.0)
+
     args = ap.parse_args()
     print(args)
     main(
@@ -123,4 +133,6 @@ if __name__ == "__main__":
         offline=args.offline,
         checkpoint_path=args.checkpoint_path,
         predict_xstart=args.predict_xstart,
+        noise_weight=args.noise_weight,
+        evaluate=args.evaluate
     )

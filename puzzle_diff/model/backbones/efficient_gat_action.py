@@ -18,7 +18,6 @@ class New_Eff_GAT(nn.Module):
 
     def __init__(self, steps, input_channels=2, output_channels=2) -> None:
         super().__init__()
-
         self.visual_backbone = timm.create_model(
             "efficientnet_b0", pretrained= False, features_only=True
         )
@@ -59,7 +58,6 @@ class New_Eff_GAT(nn.Module):
         std = torch.tensor([0.2290, 0.2240, 0.2250])[None, :, None, None]
         self.register_buffer("mean", mean)
         self.register_buffer("std", std)
-
     def forward(self, xy_pos, time, patch_rgb, edge_index, batch):
         # patch_rgb = (patch_rgb - self.mean) / self.std
 
@@ -68,10 +66,9 @@ class New_Eff_GAT(nn.Module):
         # patch_rgb.shape[0], -1
         # )
         # patch_feats = patch_feats
-        #breakpoint() 
         patch_feats = self.visual_features(patch_rgb)
         final_feats = self.forward_with_feats(
-            xy_pos, time, patch_rgb, edge_index, patch_feats=patch_feats, batch=batch
+            xy_pos, time,patch_feats=patch_feats,edge_index=edge_index, batch=batch
         )
         return final_feats
 
@@ -79,33 +76,42 @@ class New_Eff_GAT(nn.Module):
         self: nn.Module,
         xy_pos: Tensor,
         time: Tensor,
-        edge_index: Tensor,
         patch_feats: Tensor,
+        edge_index: Tensor,
         batch,
     ):
         time_feats = self.time_emb(time)  # embedding, int -> 32
         pos_feats = self.pos_mlp(xy_pos)  # MLP, (x, y) -> 32
-
         # COMBINE  and transform with MLP
         combined_feats = torch.cat([patch_feats, pos_feats, time_feats], -1)
         combined_feats = self.mlp(combined_feats)
         # GNN
         feats = self.gnn_backbone(x=combined_feats, edge_index=edge_index)
+        feates=[]
+        for b in batch.unique():
+            feat= torch.mean(feats[batch==b],dim=0)
+            feates.append(feat)
+        feats=torch.stack(feates)
+        #feats = torch.stack(
+            #[torch.mean(feats[batch == b],dim=0)
+            # for b in batch.unique()
+           #  ]
+       # )
+
         #una feature per ogni frames
         #mean per video
-        feats =  torch.mean(feats)
-        breakpoint()
+
         # Residual + final transform
         #final_feats = self.final_mlp(
-            #feats + combined_feats
+          #  feats + combined_feats
         #)  # combined -> (err_x, err_y)
         #posizione
         return feats
+        
 
     def visual_features(self, patch_rgb):
         #patch_rgb = patch_rgb.permute(0,3,1,2)
         patch_rgb = (patch_rgb - self.mean) / self.std
-
         feats = self.visual_backbone.forward(patch_rgb)
         patch_feats = torch.cat(
             [

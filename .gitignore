@@ -17,3 +17,5 @@ PT_OpenPose
 Mambaforge-Linux-x86_64.sh
 *.zip
 *.tar
+puzzle_diff/model/backbones/OpenPose/openpose
+puzzle_diff/model/backbones/OpenPose/openpose
