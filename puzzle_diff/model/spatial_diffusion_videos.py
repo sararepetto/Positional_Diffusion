@@ -130,7 +130,7 @@ class GNN_Diffusion(pl.LightningModule):
         bb=None,
         classifier_free_prob=0,
         classifier_free_w=0,
-        noise_weight=0.0,
+        noise_weight=1.0,
         rotation=False,
         model_mean_type: ModelMeanType = ModelMeanType.EPSILON,
         warmup_steps=1000,

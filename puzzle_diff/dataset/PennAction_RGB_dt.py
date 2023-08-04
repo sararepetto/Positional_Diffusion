@@ -61,9 +61,9 @@ class PennAction_RGB_dt(Dataset):
             video_path = f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{self.list_files[i]}/*"
             action_path = self.phase[i]
             imgs = sorted(glob.glob(video_path))
-            for j in range(4):
-                self.frames.append(imgs[j::4])
-                self.actions.append(action_path[j::4])
+            for j in range(3):
+                self.frames.append(imgs[j::3])
+                self.actions.append(action_path[j::3])
 
           
 

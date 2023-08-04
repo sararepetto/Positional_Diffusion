@@ -305,7 +305,7 @@ def get_dataset_videos(dataset:str):
         test_dt = ntu_RGB_dt(train = False)
     elif dataset == 'pennaction':
         train_dt = PennAction_RGB_dt(train = True)
-        test_dt = PennAction_RGB_dt(train = True)
+        test_dt = PennAction_RGB_dt(train = False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
@@ -320,7 +320,7 @@ def get_dataset_pose(dataset:str):
         train_dt = ntu_POSE_dt(train = True)
         test_dt = ntu_POSE_dt(train = False)
     elif dataset == 'pennaction':
-        train_dt = PennAction_POSE_dt(train = True)
+        train_dt = PennAction_POSE_dt(train = False)
         test_dt = PennAction_POSE_dt(train = False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
