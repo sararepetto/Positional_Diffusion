@@ -1,8 +1,19 @@
 from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
+import numpy as np
 
-class Sind_Vist_dt(Dataset):
-    def __init__(self, download=False, split="train"):
+class Ikea_dt(Dataset):
+    def __init__(self, train=True):
         super().__init__()
-        data_path = Path(f"datasets/sind/{split}.story-in-sequence.json")
+        data_path = Path("/home/sara/Project/Positional_Diffusion/datasets/Ikea/Kallax")
+        if train==False:
+            data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
+        else:
+             data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
+        elements = data.tolist().keys()
+       
+
+
+if __name__ == "__main__":
+        dt = Ikea_dt()

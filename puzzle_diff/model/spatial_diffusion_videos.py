@@ -219,6 +219,7 @@ class GNN_Diffusion(pl.LightningModule):
 
     def forward(self, xy_pos, time, rgb_frames, edge_index, batch) -> Any:
         return self.model.forward(xy_pos, time, rgb_frames, edge_index, batch)
+    
     def forward_with_feats(
         self,
         xy_pos: Tensor,
@@ -375,6 +376,7 @@ class GNN_Diffusion(pl.LightningModule):
         model_output = self.forward_with_feats(
                 x, t, edge_index=edge_index, video_feats= video_feats, batch=batch
             )
+        
 
         # estimate x_0
         x_0 = {
@@ -469,9 +471,7 @@ class GNN_Diffusion(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         batch_size = batch.batch.max().item() + 1
         t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
-
         new_t = torch.gather(t, 0, batch.batch)
-
         loss = self.p_losses(
             batch.x,
             new_t,
@@ -535,7 +535,14 @@ class GNN_Diffusion(pl.LightningModule):
 
             self.log_dict(self.metrics)
         
-
+    def predict_step(self,batch,batch_idx):#tornare features e phases
+        batch_size = 1
+        t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
+        new_t = t.repeat(len(batch.x))
+        self.features = self.model.forward_with_embedding(batch.x, new_t,  batch.edge_index,batch.frames)
+        self.actions = batch.action
+        return self.features, self.actions
+     
     def validation_epoch_end(self, outputs) -> None:
         self.log_dict(self.metrics)
 
