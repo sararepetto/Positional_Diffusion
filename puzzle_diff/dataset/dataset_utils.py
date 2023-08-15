@@ -320,7 +320,7 @@ def get_dataset_pose(dataset:str):
         train_dt = ntu_POSE_dt(train = True)
         test_dt = ntu_POSE_dt(train = False)
     elif dataset == 'pennaction':
-        train_dt = PennAction_POSE_dt(train = False)
+        train_dt = PennAction_POSE_dt(train = True)
         test_dt = PennAction_POSE_dt(train = False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")

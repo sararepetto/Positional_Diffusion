@@ -2,6 +2,7 @@ from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
 import numpy as np
+import os
 
 class Ikea_dt(Dataset):
     def __init__(self, train=True):
@@ -12,6 +13,9 @@ class Ikea_dt(Dataset):
         else:
              data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
         elements = data.tolist().keys()
+        breakpoint()
+        for 
+        datas=os.listdir(data_path)[elements]
         breakpoint()
 
 
