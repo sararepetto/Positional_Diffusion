@@ -11,12 +11,13 @@ class Transformer_GNN(nn.Module):
                 TransformerConv(
                     input_size, out_channels=hidden_dim // heads, heads=heads
                 ),
-               # TransformerConv(
-                  #  hidden_dim, out_channels=hidden_dim // heads, heads=heads
-                #),
-                #TransformerConv(
-                   # hidden_dim, out_channels=hidden_dim // heads, heads=heads
-                #),
+                TransformerConv(
+                    hidden_dim, out_channels=hidden_dim // heads, heads=heads
+                ),
+               TransformerConv(
+                   hidden_dim, out_channels=hidden_dim // heads, heads=heads
+                ),
+              
                 TransformerConv(
                     hidden_dim,
                     heads=heads,
@@ -31,9 +32,9 @@ class Transformer_GNN(nn.Module):
         x = nn.functional.gelu(x)
         x = self.module_list[1](x=x, edge_index=edge_index)
 
-        #x = nn.functional.gelu(x)
-        #x = self.module_list[2](x=x, edge_index=edge_index)
+        x = nn.functional.gelu(x)
+        x = self.module_list[2](x=x, edge_index=edge_index)
 
-        #x = nn.functional.gelu(x)
-        #x = self.module_list[3](x=x, edge_index=edge_index)
+        x = nn.functional.gelu(x)
+        x = self.module_list[3](x=x, edge_index=edge_index)
         return x

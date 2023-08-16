@@ -482,7 +482,6 @@ class GNN_Diffusion(pl.LightningModule):
             edge_index=batch.edge_index,
             batch=batch.batch,
         )
-
         if batch_idx == 0 and self.local_rank == 0:
             imgs = self.p_sample_loop(
                 batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch

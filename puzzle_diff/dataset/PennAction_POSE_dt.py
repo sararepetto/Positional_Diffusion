@@ -40,6 +40,7 @@ class PennAction_POSE_dt(Dataset):
                     phase = np.load(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/val/{i}/{pos[j]}")
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
+
         else:
             self.data_path=[]
             self.phase=[]
@@ -52,7 +53,6 @@ class PennAction_POSE_dt(Dataset):
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
         self.list_files= self.data
-
         self.frames=[]
         self.actions=[]
         self.X_coordinates=[]
@@ -69,7 +69,7 @@ class PennAction_POSE_dt(Dataset):
                 self.actions.append(action_path[j::3])
                 self.X_coordinates.append(self.x_coordinates[j::3])
                 self.Y_coordinates.append(self.y_coordinates[j::3])
-                self.actions.append(action_path[j::3])
+                
     def __len__(self):
         return len(self.frames)
     

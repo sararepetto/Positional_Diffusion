@@ -57,27 +57,40 @@ class PennAction_RGB_dt(Dataset):
     
         self.frames=[]
         self.actions=[]
+        self.X_coordinates=[]
+        self.Y_coordinates=[]
+
         for i in range(len(self.list_files)):
             video_path = f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{self.list_files[i]}/*"
             action_path = self.phase[i]
+            labels = scipy.io.loadmat(f'/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/labels/{self.list_files[i]}.mat')
+            self.x_coordinates = labels ['x']
+            self.y_coordinates = labels['y']
             imgs = sorted(glob.glob(video_path))
             for j in range(4):
                 self.frames.append(imgs[j::4])
                 self.actions.append(action_path[j::4])
-
-          
-
+                self.X_coordinates.append(self.x_coordinates[j::3])
+                self.Y_coordinates.append(self.y_coordinates[j::3])
 
     def __len__(self):
         return len(self.frames)
+  
 
     def __getitem__(self,idx):
         imgs = self.frames[idx]
         actions = self.actions[idx]
+        x_coordinates = self.X_coordinates[idx]
+        y_coordinates = self.Y_coordinates[idx]
         video=[]
         for i in range(len(imgs)):
             image = cv2.imread(f'{imgs[i]}')
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            xmin = np.min(x_coordinates[i]) - min(np.min(x_coordinates[i]),20)
+            xmax = np.max(x_coordinates[i])+ min((image.shape[1]-np.max(x_coordinates[i])),20)
+            ymin = np.min(y_coordinates[i]) - min(np.min(y_coordinates[i]),20)
+            ymax = np.max (y_coordinates[i]) + min((image.shape[0]-np.max(y_coordinates[i])),20)
+            image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
             image = cv2.resize(image,(64,64))
             image = torch.from_numpy(image)
             video.append(image) 
@@ -87,7 +100,7 @@ class PennAction_RGB_dt(Dataset):
 if __name__ == "__main__":
         dt = PennAction_RGB_dt()
         frames=0
-        x= dt[50]
+        x= dt[30]
         print(len(x))
         print(x[0].shape)
         plt.figure()
