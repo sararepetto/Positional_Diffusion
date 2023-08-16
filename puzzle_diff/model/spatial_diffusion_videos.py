@@ -486,7 +486,7 @@ class GNN_Diffusion(pl.LightningModule):
                 batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
             )
             img = imgs[-1]
-            save_path = Path(f"results/{self.logger.experiment.name}/train")
+            #save_path = Path(f"results/{self.logger.experiment.name}/train")
             #for i in range(
                 #min(batch.batch.max().item(), 2)
             #):  # save max 2 videos during training loop

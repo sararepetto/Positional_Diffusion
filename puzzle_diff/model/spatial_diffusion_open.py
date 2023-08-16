@@ -535,7 +535,17 @@ class GNN_Diffusion(pl.LightningModule):
                 self.metrics["accuracy"].update(acc)
                 self.metrics["tau"].update(tau)
                 self.metrics["pmr"].update(pmr)
-
+                save_path = Path(f"results/{self.logger.experiment.name}/test")
+                if batch_idx == 0 and self.local_rank == 0:
+                    for i in range( min(batch.batch.max().item(), 2)):  # save max 2 videos during training loop
+                        idx = torch.where(batch.batch == i)[0]
+                        frames_rgb = batch.frames[idx]
+                        gt_pos = batch.x[idx]
+                        self.save_video(frames_rgb=frames_rgb,
+                        pos=pos,
+                        gt_pos=gt_pos,
+                        file_name=save_path,
+                    )
             self.log_dict(self.metrics)
         
 

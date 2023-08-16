@@ -7,15 +7,17 @@ import os
 class Ikea_dt(Dataset):
     def __init__(self, train=True):
         super().__init__()
+        elements=[]
         data_path = Path('/media/sara/Crucial X6/Ikea/Kallax')
-        if train==False:
+        if train==True:
             data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
         else:
              data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
-        elements = data.tolist().keys()
+        for i in data.tolist().keys():
+             elements.append(i)
+        
         breakpoint()
-        for 
-        datas=os.listdir(data_path)[elements]
+           # datas=data_path/i
         breakpoint()
 
 
