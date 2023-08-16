@@ -41,9 +41,9 @@ class Body(object):
         data = torch.stack(new).float()
         if torch.cuda.is_available():
                 data = data.cuda()
-        #with torch.no_grad():#da capire con il finetuning come funziona, togliendo torch.no_grad
-        Mconv7_stage6_L1, Mconv7_stage6_L2 = self.model(data)
-        Mconv7_stage6_L1 = Mconv7_stage6_L1.detach().cpu().numpy()
+        with torch.no_grad():#da capire con il finetuning come funziona, togliendo torch.no_grad
+            Mconv7_stage6_L1, Mconv7_stage6_L2 = self.model(data)
+            Mconv7_stage6_L1 = Mconv7_stage6_L1.detach().cpu().numpy()
         Mconv7_stage6_L2 = Mconv7_stage6_L2.detach().cpu().numpy()
            
 

@@ -11,12 +11,12 @@ class Transformer_GNN(nn.Module):
                 TransformerConv(
                     input_size, out_channels=hidden_dim // heads, heads=heads
                 ),
-                TransformerConv(
-                    hidden_dim, out_channels=hidden_dim // heads, heads=heads
-                ),
-                TransformerConv(
-                    hidden_dim, out_channels=hidden_dim // heads, heads=heads
-                ),
+                #TransformerConv(
+                    #hidden_dim, out_channels=hidden_dim // heads, heads=heads
+               # ),
+                #TransformerConv(
+                    #hidden_dim, out_channels=hidden_dim // heads, heads=heads
+                #),
                 TransformerConv(
                     hidden_dim,
                     heads=heads,

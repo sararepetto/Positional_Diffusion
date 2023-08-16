@@ -597,7 +597,6 @@ def kendall_tau(order, ground_truth):
     if len(ground_truth) == 1:
         if ground_truth[0] == order[0]:
             return 1.0
-    #chiedere a Gianluca perchè non si può usare il ground_truth direttamente
     #corr, _ = kendalltau(order, ground_truth))
     reorder_dict = {}
 
