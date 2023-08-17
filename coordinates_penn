@@ -11,20 +11,20 @@ from skimage.transform import resize
 import scipy.io
 
 
-data_path = Path('/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames')
+data_path = Path('datasets/Penn_Action/train_frames')
 list_files= sorted(os.listdir(data_path))
 zero= 0
 for i in range(len(list_files)):
         element=list_files[i]
-        video_path=f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{element}"
+        video_path=f"datasets/Penn_Action/train_frames/{element}"
         video=[]
         imgs = sorted(os.listdir(video_path))
-        labels = scipy.io.loadmat(f'/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/labels/{element}.mat')
+        labels = scipy.io.loadmat(f'datasets/Penn_Action/labels/{element}.mat')
         x_coordinates = labels ['x']
         y_coordinates = labels['y']
         bbox = labels['bbox']
         for i in range(len(imgs)-1):
-            image = cv2.imread(f'/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{element}/{imgs[i]}')
+            image = cv2.imread(f'datasets/Penn_Action/train_frames/{element}/{imgs[i]}')
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             xmin = np.min(x_coordinates[i]) #- min(np.min(x_coordinates[i]),20)
             xmax = np.max(x_coordinates[i])#+ min((image.shape[1]-np.max(x_coordinates[i])),20)

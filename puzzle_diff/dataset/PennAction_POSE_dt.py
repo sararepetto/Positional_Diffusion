@@ -33,11 +33,11 @@ class PennAction_POSE_dt(Dataset):
             self.data_path=[]
             self.phase=[]
             for i in my_dictionary.keys():
-                pos=sorted(os.listdir(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/val/{i}"))
+                pos=sorted(os.listdir(f"datasets/Penn_Action/penn_action_labels/val/{i}"))
                 new_pos = [sub.replace('.npy','') for sub in pos]
                 self.data_path.append(new_pos)
                 for j in range(len(pos)):
-                    phase = np.load(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/val/{i}/{pos[j]}")
+                    phase = np.load(f"datasets/Penn_Action/penn_action_labels/val/{i}/{pos[j]}")
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
 
@@ -45,11 +45,11 @@ class PennAction_POSE_dt(Dataset):
             self.data_path=[]
             self.phase=[]
             for i in my_dictionary.keys():
-                pos=sorted(os.listdir(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/train/{i}"))
+                pos=sorted(os.listdir(f"datasets/Penn_Action/penn_action_labels/train/{i}"))
                 new_pos= [sub.replace('.npy','') for sub in pos]
                 self.data_path.append(new_pos)
                 for j in range(len(pos)):
-                    phase = np.load(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/train/{i}/{pos[j]}")
+                    phase = np.load(f"datasets/Penn_Action/penn_action_labels/train/{i}/{pos[j]}")
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
         self.list_files= self.data
@@ -59,9 +59,9 @@ class PennAction_POSE_dt(Dataset):
         self.X_coordinates=[]
         self.Y_coordinates=[]
         for i in range(len(self.list_files)):
-            video_path = f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{self.list_files[i]}/*"
+            video_path = f"datasets/Penn_Action/train_frames/{self.list_files[i]}/*"
             action_path = self.phase[i]
-            labels = scipy.io.loadmat(f'/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/labels/{self.list_files[i]}.mat')
+            labels = scipy.io.loadmat(f'datasets/Penn_Action/labels/{self.list_files[i]}.mat')
             self.x_coordinates = labels ['x']
             self.y_coordinates = labels['y']
             imgs = sorted(glob.glob(video_path))
@@ -96,7 +96,7 @@ class PennAction_POSE_dt(Dataset):
         video = torch.stack(video)
         return video,actions
     
-    
+
 if __name__ == "__main__":
         dt = PennAction_POSE_dt()
         frames=0

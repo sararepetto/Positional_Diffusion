@@ -14,9 +14,9 @@ class Ikea_dt(Dataset):
         self.elements=[]
         data_path = Path('/media/sara/Crucial X6/Ikea/Kallax')
         if train==True:
-            data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
+            data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
         else:
-             data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
+             data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
         for i in data.tolist().keys():
              self.elements.append(i)
         self.frames=[]
