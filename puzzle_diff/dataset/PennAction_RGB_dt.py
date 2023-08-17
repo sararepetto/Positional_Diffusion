@@ -67,9 +67,9 @@ class PennAction_RGB_dt(Dataset):
             self.x_coordinates = labels ['x']
             self.y_coordinates = labels['y']
             imgs = sorted(glob.glob(video_path))
-            for j in range(4):
-                self.frames.append(imgs[j::4])
-                self.actions.append(action_path[j::4])
+            for j in range(3):
+                self.frames.append(imgs[j::3])
+                self.actions.append(action_path[j::3])
                 self.X_coordinates.append(self.x_coordinates[j::3])
                 self.Y_coordinates.append(self.y_coordinates[j::3])
 

@@ -53,6 +53,7 @@ class PennAction_POSE_dt(Dataset):
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
         self.list_files= self.data
+
         self.frames=[]
         self.actions=[]
         self.X_coordinates=[]
@@ -74,8 +75,6 @@ class PennAction_POSE_dt(Dataset):
         return len(self.frames)
     
     def __getitem__(self,idx):
-        #element=self.list_files[idx]
-        #video_path=f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{element}"
         imgs = self.frames[idx]
         actions = self.actions[idx]
         x_coordinates = self.X_coordinates[idx]
@@ -93,11 +92,11 @@ class PennAction_POSE_dt(Dataset):
             image = np.float32(image) / 256 - 0.5 
             image = np.ascontiguousarray(image)
             image = torch.from_numpy(image)
-            video.append(image)
-            
+            video.append(image)  
         video = torch.stack(video)
-        #video= video[::4] #prima5
         return video,actions
+    
+    
 if __name__ == "__main__":
         dt = PennAction_POSE_dt()
         frames=0

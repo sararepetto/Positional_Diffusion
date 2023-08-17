@@ -486,19 +486,20 @@ class GNN_Diffusion(pl.LightningModule):
                 batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
             )
             img = imgs[-1]
-            #save_path = Path(f"results/{self.logger.experiment.name}/train")
-            #for i in range(
-                #min(batch.batch.max().item(), 2)
-            #):  # save max 2 videos during training loop
-                #idx = torch.where(batch.batch == i)[0]
-               # frames_rgb = batch.frames[idx]
-                #gt_pos = batch.x[idx]
-                #pos = img[idx]
-                #self.save_video(frames_rgb=frames_rgb,
-                        #pos=pos,
-                        #gt_pos=gt_pos,
-                        #file_name=save_path,
-                   # )
+            breakpoint()
+            save_path = Path(f"results/{self.logger.experiment.name}/train")
+            for i in range(
+                min(batch.batch.max().item(), 2)
+            ):  # save max 2 videos during training loop
+                idx = torch.where(batch.batch == i)[0]
+                frames_rgb = batch.frames[idx]
+                gt_pos = batch.x[idx]
+                pos = img[idx]
+                self.save_video(frames_rgb=frames_rgb,
+                        pos=pos,
+                        gt_pos=gt_pos,
+                        file_name=save_path,
+                    )
 
 
         self.log("loss", loss)

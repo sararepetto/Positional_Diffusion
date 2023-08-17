@@ -57,9 +57,9 @@ class Video_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from PennAction_POSE_dt import PennAction_POSE_dt
+    from PennAction_RGB_dt import PennAction_RGB_dt
 
-    train_dt = PennAction_POSE_dt(train = True)
+    train_dt = PennAction_RGB_dt(train = True)
     dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
 
     dl = torch_geometric.loader.DataLoader(dt, batch_size=10)
