@@ -486,7 +486,6 @@ class GNN_Diffusion(pl.LightningModule):
                 batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
             )
             img = imgs[-1]
-            breakpoint()
             save_path = Path(f"results/{self.logger.experiment.name}/train")
             for i in range(
                 min(batch.batch.max().item(), 2)
@@ -538,6 +537,7 @@ class GNN_Diffusion(pl.LightningModule):
                     for i in range( min(batch.batch.max().item(), 2)):  # save max 2 videos during training loop
                         idx = torch.where(batch.batch == i)[0]
                         frames_rgb = batch.frames[idx]
+                        pos = x[idx]
                         gt_pos = batch.x[idx]
                         self.save_video(frames_rgb=frames_rgb,
                         pos=pos,
@@ -570,6 +570,7 @@ class GNN_Diffusion(pl.LightningModule):
         gt_pos,
         file_name: Path,
         ):
+        breakpoint()
         new_frames=frames_rgb[torch.argsort(pos.squeeze()).cpu().numpy()].detach().cpu().numpy()
         new_frames = cv2.normalize(new_frames, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
         videos = wandb.Video(new_frames, fps = 1)
