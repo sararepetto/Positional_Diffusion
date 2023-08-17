@@ -19,7 +19,7 @@ class Eff_GAT(nn.Module):
     def __init__(self, steps, input_channels=2, output_channels=2) -> None:
         super().__init__()
         self.visual_backbone = timm.create_model(
-            "efficientnet_b0", pretrained= False, features_only=True
+            "efficientnet_b0", pretrained= True, features_only=True
         )
         self.input_channels = input_channels
         self.output_channels = output_channels
@@ -97,6 +97,23 @@ class Eff_GAT(nn.Module):
         #posizione
         return final_feats
         
+    def forward_with_embedding(
+        self: nn.Module,
+        xy_pos: Tensor,
+        time: Tensor,
+        edge_index: Tensor,
+        patch_feats: Tensor,
+    ): 
+        #new_t = torch.gather(t, 0, batch.batch)
+        time_feats = self.time_emb(time)  # embedding, int -> 32
+        pos_feats = self.pos_mlp(xy_pos)  # MLP, (x, y) -> 32
+        # COMBINE  and transform with MLP
+        patch_feats = self.visual_features(patch_feats)
+        combined_feats = torch.cat([patch_feats, pos_feats, time_feats], -1)
+        combined_feats = self.mlp(combined_feats)
+        # GNN
+        feats = self.gnn_backbone(x=combined_feats, edge_index=edge_index)
+        return feats
 
     def visual_features(self, patch_rgb):
         #patch_rgb = patch_rgb.permute(0,3,1,2)
@@ -110,7 +127,7 @@ class Eff_GAT(nn.Module):
             ],
             -1,
         )
-
+        
         # patch_feats = self.visual_backbone.forward(patch_rgb)[3].reshape(
         # patch_rgb.shape[0], -1
         # )

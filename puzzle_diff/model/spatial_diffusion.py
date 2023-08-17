@@ -646,7 +646,7 @@ class GNN_Diffusion(pl.LightningModule):
     def configure_optimizers(self):
         # optimizer = torch.optim.Adagrad(self.parameters(), lr=self.learning_rate)
         # optimizer = Adafactor(self.parameters())
-        optimizer = Adafactor(self.parameters())
+        optimizer = Adafactor(self.parameters(),weight_decay=0.01)
         return optimizer
 
     def training_step(self, batch, batch_idx):
