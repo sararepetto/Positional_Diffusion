@@ -18,6 +18,8 @@ from .wiki_dt import Wiki_dt
 from .wikiart_dt import Wikiart_DT
 from .PennAction_RGB_dt import PennAction_RGB_dt
 from .PennAction_POSE_dt import PennAction_POSE_dt
+from .ikea_RGB_dt import Ikea_RGB_dt 
+from .ikea_POSE_dt import Ikea_POSE_dt
 ALLOWED_DT = ["celeba", "cifar100", "wikiart"]
 ALLOWED_TEXT = ["nips", "sind", "roc", "wiki"]
 
@@ -306,6 +308,9 @@ def get_dataset_videos(dataset:str):
     elif dataset == 'pennaction':
         train_dt = PennAction_RGB_dt(train = True)
         test_dt = PennAction_RGB_dt(train = False)
+    elif dataset == 'ikea':
+        train_dt =Ikea_RGB_dt(train = True)
+        test_dt = Ikea_RGB_dt(train = False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
@@ -322,6 +327,9 @@ def get_dataset_pose(dataset:str):
     elif dataset == 'pennaction':
         train_dt = PennAction_POSE_dt(train = True)
         test_dt = PennAction_POSE_dt(train = False)
+    elif dataset == 'ikea':
+        train_dt =Ikea_POSE_dt(train = True)
+        test_dt = Ikea_POSE_dt(train = False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     

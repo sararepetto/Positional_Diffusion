@@ -8,7 +8,7 @@ import glob
 import cv2 
 import torch
 
-class Ikea_dt(Dataset):
+class Ikea_POSE_dt(Dataset):
     def __init__(self, train=True):
         super().__init__()
         self.elements=[]
@@ -41,7 +41,9 @@ class Ikea_dt(Dataset):
         for i in range(len(imgs)):
             image = cv2.imread(f'{imgs[i]}')
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            image = cv2.resize(image,(64,64))
+            image = cv2.resize(image,(128,128))#provare a togliere il resize e prendere soltanto l'embedding 18
+            image = np.float32(image) / 256 - 0.5 
+            image = np.ascontiguousarray(image)
             image = torch.from_numpy(image)
             video.append(image) 
         video = torch.stack(video)
