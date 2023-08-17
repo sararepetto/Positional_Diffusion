@@ -175,10 +175,10 @@ class CVAE(nn.Module):
         output = self.decoder(data)
         return enc,output
 
-#puzzle_diff/dataset
+#/home/sara/Project/Positional_Diffusion/puzzle_diff/dataset
 if __name__ == '__main__':
     import sys 
-    sys.path.append('puzzle_diff/dataset')
+    sys.path.append('/home/sara/Project/Positional_Diffusion/puzzle_diff/dataset')
     from NTU_60_dt import NTU_60_dt
     from skeleton_dataset import Skeleton_dataset
     train_dt = NTU_60_dt()
