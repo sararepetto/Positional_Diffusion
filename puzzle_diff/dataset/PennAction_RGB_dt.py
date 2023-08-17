@@ -33,11 +33,11 @@ class PennAction_RGB_dt(Dataset):
             self.data_path=[]
             self.phase=[]
             for i in my_dictionary.keys():
-                pos=sorted(os.listdir(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/val/{i}"))
+                pos=sorted(os.listdir(f"datasets/Penn_Action/penn_action_labels/val/{i}"))
                 new_pos = [sub.replace('.npy','') for sub in pos]
                 self.data_path.append(new_pos)
                 for j in range(len(pos)):
-                    phase = np.load(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/val/{i}/{pos[j]}")
+                    phase = np.load(f"datasets/Penn_Action/penn_action_labels/val/{i}/{pos[j]}")
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
 
@@ -45,11 +45,11 @@ class PennAction_RGB_dt(Dataset):
             self.data_path=[]
             self.phase=[]
             for i in my_dictionary.keys():
-                pos=sorted(os.listdir(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/train/{i}"))
+                pos=sorted(os.listdir(f"datasets/Penn_Action/penn_action_labels/train/{i}"))
                 new_pos= [sub.replace('.npy','') for sub in pos]
                 self.data_path.append(new_pos)
                 for j in range(len(pos)):
-                    phase = np.load(f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/penn_action_labels/train/{i}/{pos[j]}")
+                    phase = np.load(f"datasets/Penn_Action/penn_action_labels/train/{i}/{pos[j]}")
                     self.phase.append(phase)
             self.data=[element for action in self.data_path for element in action]
         self.list_files= self.data
@@ -57,7 +57,7 @@ class PennAction_RGB_dt(Dataset):
         self.frames=[]
         self.actions=[]
         for i in range(len(self.list_files)):
-            video_path = f"/home/sara/Project/Positional_Diffusion/datasets/Penn_Action/train_frames/{self.list_files[i]}/*"
+            video_path = f"datasets/Penn_Action/train_frames/{self.list_files[i]}/*.jpg"
             action_path = self.phase[i]
             imgs = sorted(glob.glob(video_path))
             for j in range(3):
@@ -76,7 +76,10 @@ class PennAction_RGB_dt(Dataset):
         video=[]
         for i in range(len(imgs)):
             image = cv2.imread(f'{imgs[i]}')
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            try:
+              image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            except:
+              print(imgs[i])
             image = cv2.resize(image,(64,64))
             image = torch.from_numpy(image)
             video.append(image) 
