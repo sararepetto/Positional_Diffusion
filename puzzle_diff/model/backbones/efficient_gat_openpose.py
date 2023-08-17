@@ -5,7 +5,10 @@ from torch import Tensor
 from torch_geometric.nn import GraphNorm
 from .Transformer_GNN import Transformer_GNN
 import sys 
-sys.path.append('/home/sara/Project/Positional_Diffusion/puzzle_diff/model/backbones/OpenPose/openpose')
+import os 
+
+
+sys.path.append('puzzle_diff/model/backbones/OpenPose/openpose')
 from OpenPose_model import embedding
 
 
