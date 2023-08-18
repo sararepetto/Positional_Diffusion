@@ -51,7 +51,7 @@ class Ikea_RGB_dt(Dataset):
 
 
 if __name__ == "__main__":
-        dt = Ikea_dt()
+        dt = Ikea_RGB_dt()
         frames=0
         x= dt[50]
         print(len(x))

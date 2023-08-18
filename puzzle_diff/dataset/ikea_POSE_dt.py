@@ -17,15 +17,18 @@ class Ikea_POSE_dt(Dataset):
             data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
         else:
              data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
+        breakpoint()
         for i in data.tolist().keys():
              self.elements.append(i)
         self.frames=[]
         self.actions=[]
+
         dev = ['dev1','dev2','dev3']
         for i in range(len(self.elements)):
             for j in range(len(dev)):
                 video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
                 action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
+                coordinates_path = [k for k in data.tolist()[self.elements[i]]['pose']]
                 imgs = sorted(glob.glob(video_path))
                 for z in range(8): ##fare forse ogni 10 (chiedere a Gianluca quanto riesce a contenere come dati da riordianre
                     self.frames.append(imgs[z::8])
@@ -53,7 +56,7 @@ class Ikea_POSE_dt(Dataset):
 
 
 if __name__ == "__main__":
-        dt = Ikea_dt()
+        dt = Ikea_POSE_dt()
         frames=0
         x= dt[50]
         print(len(x))

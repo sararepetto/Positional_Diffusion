@@ -570,7 +570,6 @@ class GNN_Diffusion(pl.LightningModule):
         gt_pos,
         file_name: Path,
         ):
-        breakpoint()
         new_frames=frames_rgb[torch.argsort(pos.squeeze()).cpu().numpy()].detach().cpu().numpy()
         new_frames = cv2.normalize(new_frames, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
         videos = wandb.Video(new_frames, fps = 1)
