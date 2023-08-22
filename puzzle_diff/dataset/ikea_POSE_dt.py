@@ -12,7 +12,7 @@ class Ikea_POSE_dt(Dataset):
     def __init__(self, train=True):
         super().__init__()
         self.elements=[]
-        data_path = Path('/media/sara/Crucial X6/Ikea/Kallax')
+        data_path = Path('datasets/Ikea/Kallax')
         if train==True:
             data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
         else:
@@ -26,7 +26,7 @@ class Ikea_POSE_dt(Dataset):
         dev = ['dev1','dev2','dev3']
         for i in range(len(self.elements)):
             for j in range(len(dev)):
-                video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
+                video_path = f"datasets/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
                 action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
                 coordinates_path = [k for k in data.tolist()[self.elements[i]]['pose']]
                 imgs = sorted(glob.glob(video_path))
