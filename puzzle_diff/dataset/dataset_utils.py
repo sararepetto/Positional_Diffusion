@@ -301,16 +301,16 @@ def get_dataset_skeletons(dataset: str):
 
     return train_dt, val_dt, test_dt
 
-def get_dataset_videos(dataset:str):
+def get_dataset_videos(dataset:str,subsampling):
     if dataset == 'ntu':
         train_dt = ntu_RGB_dt(train = True)
         test_dt = ntu_RGB_dt(train = False)
     elif dataset == 'pennaction':
-        train_dt = PennAction_RGB_dt(train = True)
-        test_dt = PennAction_RGB_dt(train = False)
+        train_dt = PennAction_RGB_dt(train =True,subsampling = subsampling)
+        test_dt = PennAction_RGB_dt(train = False,subsampling = subsampling)
     elif dataset == 'ikea':
-        train_dt =Ikea_RGB_dt(train = True)
-        test_dt = Ikea_RGB_dt(train = False)
+        train_dt =Ikea_RGB_dt(train = True,subsampling = subsampling)
+        test_dt = Ikea_RGB_dt(train = False,subsampling = subsampling)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     

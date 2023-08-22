@@ -7,12 +7,16 @@ import os
 import glob 
 import cv2 
 import torch
+import sys 
 
 class Ikea_RGB_dt(Dataset):
-    def __init__(self, train=True):
+    def __init__(self, train=True,subsampling=3):
         super().__init__()
+        self.subsampling = subsampling
         self.elements=[]
+        sys.path.append('/media/sara/Crucial X6/Ikea/Kallax')
         data_path = Path('/media/sara/Crucial X6/Ikea/Kallax')
+        #sys.path.append('/home/sara/Project/Positional_Diffusion/puzzle_diff')
         if train==True:
             data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
         else:
@@ -23,14 +27,18 @@ class Ikea_RGB_dt(Dataset):
         self.actions=[]
         dev = ['dev1','dev2','dev3']
         for i in range(len(self.elements)):
-            for j in range(len(dev)):
-                video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
-                action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
-                imgs = sorted(glob.glob(video_path))
-                for z in range(8): ##fare forse ogni 10 (chiedere a Gianluca quanto riesce a contenere come dati da riordianre
-                    self.frames.append(imgs[z::8])
-                    self.actions.append(action_path[z::8])
-        
+            if self.elements[i] != '.~lock.Accordo_affiliatura_09.2022_ITA_REPETTO_UNIPADOVA.docx#':##come si elimina questo file?
+                for j in range(len(dev)):
+                    sys.path.append('/media/sara/Crucial X6/Ikea/Kallax')
+                    video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
+                    action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
+                    imgs = sorted(glob.glob(video_path))
+                    if len(imgs)== 0:
+                        print(self.elements[i])
+                    for z in range(self.subsampling): ##fare forse ogni 10 (chiedere a Gianluca quanto riesce a contenere come dati da riordianre
+                        self.frames.append(imgs[z::self.subsampling])
+                        self.actions.append(action_path[z::self.subsampling])
+        breakpoint()
     def __len__(self):
         return len(self.frames)
     
@@ -45,7 +53,6 @@ class Ikea_RGB_dt(Dataset):
             image = torch.from_numpy(image)
             video.append(image) 
         video = torch.stack(video)
-        breakpoint()
         return video,actions
     
 
@@ -55,7 +62,10 @@ if __name__ == "__main__":
         frames=0
         x= dt[50]
         print(len(x))
+        breakpoint()
         print(x[0].shape)
         plt.figure()
-        plt.imshow(x[0])
+        plt.imshow(x[0][0])
+        plt.show()
+        plt.imshow(x[0][1])
         plt.show()

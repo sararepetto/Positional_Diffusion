@@ -12,8 +12,9 @@ import scipy.io
 import glob
 
 class PennAction_RGB_dt(Dataset):
-    def __init__(self,train=True):
+    def __init__(self,train=True, subsampling=3):
         super().__init__()
+        self.subsampling = subsampling
         my_dictionary = dict()
         my_dictionary['baseball_pitch']=[]
         my_dictionary['baseball_swing']=[]
@@ -67,11 +68,11 @@ class PennAction_RGB_dt(Dataset):
             self.x_coordinates = labels ['x']
             self.y_coordinates = labels['y']
             imgs = sorted(glob.glob(video_path))
-            for j in range(3):
-                self.frames.append(imgs[j::3])
-                self.actions.append(action_path[j::3])
-                self.X_coordinates.append(self.x_coordinates[j::3])
-                self.Y_coordinates.append(self.y_coordinates[j::3])
+            for j in range(subsampling):
+                self.frames.append(imgs[j::self.subsampling])
+                self.actions.append(action_path[j::self.subsampling])
+                self.X_coordinates.append(self.x_coordinates[j::self.subsampling])
+                self.Y_coordinates.append(self.y_coordinates[j::self.subsampling])
 
     def __len__(self):
         return len(self.frames)
