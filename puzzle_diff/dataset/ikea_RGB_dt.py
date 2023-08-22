@@ -14,8 +14,8 @@ class Ikea_RGB_dt(Dataset):
         super().__init__()
         self.subsampling = subsampling
         self.elements=[]
-        sys.path.append('/media/sara/Crucial X6/Ikea/Kallax')
-        data_path = Path('/media/sara/Crucial X6/Ikea/Kallax')
+        #sys.path.append('/datasets/Ikea/Kallax')
+        data_path = Path('/datasets/Ikea/Kallax')
         #sys.path.append('/home/sara/Project/Positional_Diffusion/puzzle_diff')
         if train==True:
             data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
@@ -29,8 +29,8 @@ class Ikea_RGB_dt(Dataset):
         for i in range(len(self.elements)):
             if self.elements[i] != '.~lock.Accordo_affiliatura_09.2022_ITA_REPETTO_UNIPADOVA.docx#':##come si elimina questo file?
                 for j in range(len(dev)):
-                    sys.path.append('/media/sara/Crucial X6/Ikea/Kallax')
-                    video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
+                    sys.path.append('datasets/Ikea/Kallax')
+                    video_path = f"datasets/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
                     action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
                     imgs = sorted(glob.glob(video_path))
                     if len(imgs)== 0:

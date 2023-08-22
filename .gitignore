@@ -19,3 +19,4 @@ Mambaforge-Linux-x86_64.sh
 *.tar
 puzzle_diff/model/backbones/OpenPose/openpose
 puzzle_diff/model/backbones/OpenPose/openpose
+*.pt
