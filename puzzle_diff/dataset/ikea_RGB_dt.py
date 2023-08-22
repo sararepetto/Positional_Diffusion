@@ -38,7 +38,6 @@ class Ikea_RGB_dt(Dataset):
                     for z in range(self.subsampling): ##fare forse ogni 10 (chiedere a Gianluca quanto riesce a contenere come dati da riordianre
                         self.frames.append(imgs[z::self.subsampling])
                         self.actions.append(action_path[z::self.subsampling])
-        breakpoint()
     def __len__(self):
         return len(self.frames)
     
