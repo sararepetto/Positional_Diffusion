@@ -8,7 +8,7 @@ import glob
 import cv2 
 import torch
 
-class Ikea_dt(Dataset):
+class Ikea_POSE_dt(Dataset):
     def __init__(self, train=True):
         super().__init__()
         self.elements=[]
@@ -16,16 +16,19 @@ class Ikea_dt(Dataset):
         if train==True:
             data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_train.npy",allow_pickle=True)
         else:
-             data = np.load("/home/sara/Project/Positional_Diffusion/datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
+            data = np.load("datasets/Ikea/npyrecords/kallax_shelf_drawer_val.npy",allow_pickle=True)
+        breakpoint()
         for i in data.tolist().keys():
              self.elements.append(i)
         self.frames=[]
         self.actions=[]
+
         dev = ['dev1','dev2','dev3']
         for i in range(len(self.elements)):
             for j in range(len(dev)):
                 video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.elements[i]}/{dev[j]}/images/*"
                 action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
+                coordinates_path = [k for k in data.tolist()[self.elements[i]]['pose']]
                 imgs = sorted(glob.glob(video_path))
                 for z in range(8): ##fare forse ogni 10 (chiedere a Gianluca quanto riesce a contenere come dati da riordianre
                     self.frames.append(imgs[z::8])
@@ -41,7 +44,9 @@ class Ikea_dt(Dataset):
         for i in range(len(imgs)):
             image = cv2.imread(f'{imgs[i]}')
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            image = cv2.resize(image,(64,64))
+            image = cv2.resize(image,(128,128))#provare a togliere il resize e prendere soltanto l'embedding 18
+            image = np.float32(image) / 256 - 0.5 
+            image = np.ascontiguousarray(image)
             image = torch.from_numpy(image)
             video.append(image) 
         video = torch.stack(video)
@@ -51,7 +56,7 @@ class Ikea_dt(Dataset):
 
 
 if __name__ == "__main__":
-        dt = Ikea_dt()
+        dt = Ikea_POSE_dt()
         frames=0
         x= dt[50]
         print(len(x))

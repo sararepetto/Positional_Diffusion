@@ -22,16 +22,23 @@ class NTU_60_dt(Dataset):
         else:
             self.data= torch.stack(torch.load('datasets/NTU_60/xsub/train_data_1.pt'))
             self.label=torch.stack(torch.load('datasets/NTU_60/xsub/train_label_1.pt'))
-
         self.N, _, _, self.T = self.data.shape
+        self.new_data=[]
+        
+        for i in range(self.N):
+            for j in range(6):
+                self.new_data.append(self.data[i][:,:,j::6].permute(2,0,1))
+
+
     def __len__(self):
         return self.N
 
     def __getitem__(self, index):
-        data = self.data[index].permute(1, 0, 2).float().clone()  # [J, C, T]
-        data_aug = self.transform((data).permute(1, 2, 0).unsqueeze(-1).numpy()).squeeze().permute(2, 0, 1).float()
-        label = self.label[index].item()
-        return data, label, data_aug  # [J, C, T]
+        self.new_data[index]
+        data = self.new_data[index]# [J, C, T]
+        #data_aug = self.transform((data).permute(1, 2, 0).unsqueeze(-1).numpy()).squeeze().permute(2, 0, 1).float()
+        #label = self.label[index].item()
+        return data# [J, C, T]
 
     
 
@@ -69,4 +76,4 @@ def aug_transform():
 if __name__ == '__main__':
     dt = NTU_60_dt()
     x = dt[30]
-    breakpoint()
+    

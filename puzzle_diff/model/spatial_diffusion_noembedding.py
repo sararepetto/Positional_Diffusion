@@ -2,7 +2,7 @@ import colorsys
 import enum
 import math
 import pickle
-import cv2
+
 # from .backbones.Transformer_GNN import Transformer_GNN
 from collections import defaultdict
 from functools import partial
@@ -36,7 +36,7 @@ from transformers.optimization import Adafactor
 import wandb
 
 # from .backbones import Dark_TFConv, Eff_GAT
-from .backbones.efficient_gat import Eff_GAT
+from .backbones.efficient_gat_nobackbones import Eff_GAT_In
 
 matplotlib.use("agg")
 
@@ -130,12 +130,11 @@ class GNN_Diffusion(pl.LightningModule):
         bb=None,
         classifier_free_prob=0,
         classifier_free_w=0,
-        noise_weight=1.0,
+        noise_weight=0.0,
         rotation=False,
         model_mean_type: ModelMeanType = ModelMeanType.EPSILON,
         warmup_steps=1000,
         max_train_steps=10000,
-        finetuning=False,
         *args,
         **kwargs,
     ) -> None:
@@ -206,7 +205,7 @@ class GNN_Diffusion(pl.LightningModule):
 
         ### BACKBONE
         #self.model = Eff_GAT_TEXT(steps=steps, input_channels=1, output_channels=1)
-        self.model = Eff_GAT(steps=steps, input_channels=1, output_channels=1,finetuning = finetuning)
+        self.model = Eff_GAT_In(steps=steps, input_channels=1, output_channels=1)
         self.save_hyperparameters()
 
     def initialize_torchmetrics(self):
@@ -218,23 +217,32 @@ class GNN_Diffusion(pl.LightningModule):
         metrics["overall_nImages"] = torchmetrics.SumMetric()
         self.metrics = nn.ModuleDict(metrics)
 
-    def forward(self, xy_pos, time, rgb_frames, edge_index, batch) -> Any:
-        return self.model.forward(xy_pos, time, rgb_frames, edge_index, batch)
-    
+    def forward(self, xy_pos, time, skeletons, edge_index, batch) -> Any:
+        return self.model.forward(xy_pos, time, skeletons, edge_index, batch)
+
     def forward_with_feats(
         self,
         xy_pos: Tensor,
         time: Tensor,
+        skeletons_feats: Tensor,
         edge_index: Tensor,
-        video_feats: Tensor,
         batch,
     ) -> Any:
         return self.model.forward_with_feats(
-            xy_pos, time, edge_index, video_feats, batch
+            xy_pos, time, skeletons_feats, edge_index, batch
         )
 
-    def video_features(self, rgb_frames):
-        return self.model.visual_features(rgb_frames)
+    def skeleton_features(self, skeletons, xy_pos):
+        #new_positions=[]
+        #for i in range(skeletons.batch.max() + 1):
+                #pos = xy_pos[skeletons.batch == i]
+                #new_idx=torch.argsort(pos.squeeze())
+                #new_positions.append(new_idx)
+                
+                
+        #new_positions = torch.stack(new_positions)
+        
+        return torch.flatten(skeletons.original,start_dim=1)
 
     # forward diffusion
     def q_sample(self, x_start, t, noise=None):
@@ -255,7 +263,7 @@ class GNN_Diffusion(pl.LightningModule):
         t,
         noise=None,
         loss_type="l1",
-        rgb_frames=None,
+        skeletons=None,
         edge_index=None,
         batch=None,
     ):
@@ -267,13 +275,13 @@ class GNN_Diffusion(pl.LightningModule):
         else:
             x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
 
-        video_feats = self.video_features(rgb_frames)
+        skeletons_feats = self.skeleton_features(skeletons,x_noisy)
 
         prediction = self.forward_with_feats(
             x_noisy,
             t,
+            skeletons_feats,
             edge_index,
-            video_feats,
             batch=batch,
         ) # predicted x_0 and compare to gt x_0
 
@@ -294,7 +302,7 @@ class GNN_Diffusion(pl.LightningModule):
         return loss
 
     @torch.no_grad()
-    def p_sample_ddpm(self, x, t, t_index, cond,edge_index, video_feats, batch):
+    def p_sample_ddpm(self, x, t, t_index, cond, edge_index, patch_feats, batch):
         betas_t = extract(self.betas, t, x.shape)
         sqrt_one_minus_alphas_cumprod_t = extract(
             self.sqrt_one_minus_alphas_cumprod, t, x.shape
@@ -307,7 +315,7 @@ class GNN_Diffusion(pl.LightningModule):
             x
             - betas_t
             * self.forward_with_feats(
-                x, t, edge_index, video_feats = video_feats, batch=batch
+                x, t, cond, edge_index, patch_feats=patch_feats, batch=batch
             )
             / sqrt_one_minus_alphas_cumprod_t
         )
@@ -358,7 +366,7 @@ class GNN_Diffusion(pl.LightningModule):
 
     @torch.no_grad()
     def p_sample_ddim(
-        self, x, t, t_index, cond, edge_index, video_feats, batch
+        self, x, t, t_index, cond, edge_index, skeleton_feats, batch
     ):  
 
         prev_timestep = t - self.inference_ratio
@@ -375,9 +383,8 @@ class GNN_Diffusion(pl.LightningModule):
         beta_prev = 1 - alpha_prod_prev
 
         model_output = self.forward_with_feats(
-                x, t, edge_index=edge_index, video_feats= video_feats, batch=batch
+                x, t, edge_index=edge_index, skeletons_feats=skeleton_feats, batch=batch
             )
-        
 
         # estimate x_0
         x_0 = {
@@ -415,13 +422,14 @@ class GNN_Diffusion(pl.LightningModule):
     def p_sample_loop(self, shape, cond, edge_index, batch):
         # device = next(model.parameters()).device
         device = self.device
+
         b = shape[0]
         # start from pure noise (for each example in the batch)
         x = torch.randn(shape, device=device) * self.noise_weight
 
         xs = []
 
-        video_feats = self.video_features(cond)
+        skeleton_feats = self.skeleton_features(cond,x)
 
         for i in tqdm(
             list(reversed(range(0, self.steps, self.inference_ratio))),
@@ -434,7 +442,7 @@ class GNN_Diffusion(pl.LightningModule):
                 i,
                 cond=cond,
                 edge_index=edge_index,
-                feats=video_feats,
+                feats=skeleton_feats,
                 batch=batch,
             )
             
@@ -465,42 +473,24 @@ class GNN_Diffusion(pl.LightningModule):
         )
 
     def configure_optimizers(self):
-        optimizer = Adafactor(self.parameters(),weight_decay=0.001)
+        optimizer = Adafactor(self.parameters())
         return optimizer
 
 
     def training_step(self, batch, batch_idx):
         batch_size = batch.batch.max().item() + 1
         t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
+
         new_t = torch.gather(t, 0, batch.batch)
+
         loss = self.p_losses(
             batch.x,
             new_t,
             loss_type="huber",
-            rgb_frames=batch.frames,
+            skeletons=batch,
             edge_index=batch.edge_index,
             batch=batch.batch,
         )
-        #torch.save(model.state_dict(), "EFF_GAT.pt")
-        if batch_idx == 0 and self.local_rank == 0:
-            imgs = self.p_sample_loop(
-                batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
-            )
-            img = imgs[-1]
-            save_path = Path(f"results/{self.logger.experiment.name}/train")
-            for i in range(
-                min(batch.batch.max().item(), 2)
-            ):  # save max 2 videos during training loop
-                idx = torch.where(batch.batch == i)[0]
-                frames_rgb = batch.frames[idx]
-                gt_pos = batch.x[idx]
-                pos = img[idx]
-                self.save_video(frames_rgb=frames_rgb,
-                        pos=pos,
-                        gt_pos=gt_pos,
-                        file_name=save_path,
-                    )
-
 
         self.log("loss", loss)
 
@@ -509,10 +499,12 @@ class GNN_Diffusion(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         with torch.no_grad():
             xs = self.p_sample_loop(
-                batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
+                batch.x.shape, batch, batch.edge_index, batch=batch.batch
             )
+            
             x = xs[-1]
             n = 0
+
             for i in range(batch.batch.max() + 1):
                 pos = x[batch.batch == i]
                 device = pos.device
@@ -529,33 +521,14 @@ class GNN_Diffusion(pl.LightningModule):
                 tau = kendall_tau(
                     torch.argsort(pos.squeeze()).cpu().numpy(), gt
                 )
-                #correlation(pos,gt)
+
                 self.metrics["accuracy"].update(acc)
                 self.metrics["tau"].update(tau)
                 self.metrics["pmr"].update(pmr)
-                save_path = Path(f"results/{self.logger.experiment.name}/test")
-                if batch_idx == 0 and self.local_rank == 0:
-                    for i in range( min(batch.batch.max().item(), 2)):  # save max 2 videos during training loop
-                        idx = torch.where(batch.batch == i)[0]
-                        frames_rgb = batch.frames[idx]
-                        pos = x[idx]
-                        gt_pos = batch.x[idx]
-                        self.save_video(frames_rgb=frames_rgb,
-                        pos=pos,
-                        gt_pos=gt_pos,
-                        file_name=save_path,
-                    )
 
             self.log_dict(self.metrics)
         
-    def predict_step(self,batch,batch_idx):#tornare features e phases
-        batch_size = 1
-        t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
-        new_t = t.repeat(len(batch.x))
-        self.features = self.model.forward_with_embedding(batch.x, new_t,  batch.edge_index,batch.frames)
-        self.actions = batch.action
-        return self.features, self.actions
-     
+
     def validation_epoch_end(self, outputs) -> None:
         self.log_dict(self.metrics)
 
@@ -564,26 +537,7 @@ class GNN_Diffusion(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self.validation_step(batch, batch_idx)
-    
-    def save_video(self,
-        frames_rgb,
-        pos,
-        gt_pos,
-        file_name: Path,
-        ):
-        new_frames=frames_rgb[torch.argsort(pos.squeeze()).cpu().numpy()].detach().cpu().numpy()
-        new_frames = cv2.normalize(new_frames, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
-        videos = wandb.Video(new_frames, fps = 1)
-        self.logger.experiment.log(
-            {f"{file_name.stem}/{self.current_epoch}": videos, "global_step": self.global_step}
-        )
-       # plt.savefig(f"{file_name}/asd_{self.current_epoch}-{ind_name}.png")
-       # plt.close()
-        
-        writer = cv2.VideoWriter(f"{file_name}/asd_{self.current_epoch}.avi",cv2.VideoWriter_fourcc(*"MJPG"), 30,(128,128))
-        for frame in range(len(new_frames)):
-            writer.write(frame)
-        writer.release()
+
 def kendall_tau(order, ground_truth):
     """
     Computes the kendall's tau metric
@@ -599,11 +553,11 @@ def kendall_tau(order, ground_truth):
     if len(ground_truth) == 1:
         if ground_truth[0] == order[0]:
             return 1.0
-    #corr, _ = kendalltau(order, ground_truth))
+
     reorder_dict = {}
 
     for i in range(len(ground_truth)):
-        reorder_dict[ground_truth[i].item()] = i
+        reorder_dict[ground_truth[i]] = i
 
     new_order = [0] * len(order)
     for i in range(len(new_order)):
@@ -612,3 +566,4 @@ def kendall_tau(order, ground_truth):
 
     corr, _ = kendalltau(new_order, list(range(len(order))))
     return corr
+

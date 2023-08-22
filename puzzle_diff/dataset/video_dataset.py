@@ -36,7 +36,8 @@ class Video_dataset(pyg_data.Dataset):
             raise Exception("Dataset not provided")
 
     def get(self, idx):
-        frames,action = self.dataset_get_fn(self.dataset[idx]) # Fx C x W x H
+        frames,action = self.dataset_get_fn(self.dataset[idx])
+        #frames = self.dataset_get_fn(self.dataset[idx]) # Fx C x W x H
         #frames = torch.stack(frames)
         frames = torch.cat([self.transforms(img)[None, :] for img in frames.numpy()])
         #frames = torch.cat([img[None, :] for img in frames])#-> quando voglio lanciare 
@@ -48,7 +49,7 @@ class Video_dataset(pyg_data.Dataset):
             x=x[:, None],
             frames=frames,
             edge_index=edge_index,
-            action = action, 
+            #action = action, 
             ind_name=torch.tensor([idx]).long(),
             num_frames=torch.tensor([len(frames)]),
         )

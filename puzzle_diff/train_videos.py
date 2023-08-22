@@ -39,11 +39,13 @@ def main(
     noise_weight,
     checkpoint_path,
     predict_xstart,
-    evaluate
+    evaluate,
+    finetuning,
+    subsampling
 ):
     ### Define dataset
 
-    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset)
+    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset,subsampling=subsampling)
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
@@ -111,7 +113,7 @@ if __name__ == "__main__":
     ap.add_argument("-gpus", type=int, default=1)
     ap.add_argument("-steps", type=int, default=100)
     ap.add_argument("-num_workers", type=int, default=8)
-    ap.add_argument("-dataset", default="ntu", choices=["ntu","pennaction"])
+    ap.add_argument("-dataset", default="ntu", choices=["ntu","pennaction","ikea"])
     ap.add_argument("-sampling", default="DDIM", choices=["DDPM", "DDIM"])
     ap.add_argument("-inference_ratio", type=int, default=10)
     ap.add_argument("--offline", action="store_true", default=False)
@@ -119,6 +121,8 @@ if __name__ == "__main__":
     ap.add_argument("--predict_xstart", type=bool, default=True)
     ap.add_argument("--evaluate", type=bool, default=False)
     ap.add_argument("--noise_weight", type=float, default=0.0)
+    ap.add_argument("--finetuning", type=bool, default=False)
+    ap.add_argument("--subsampling", type=int, default=3)
 
     args = ap.parse_args()
     print(args)
@@ -134,5 +138,7 @@ if __name__ == "__main__":
         checkpoint_path=args.checkpoint_path,
         predict_xstart=args.predict_xstart,
         noise_weight=args.noise_weight,
-        evaluate=args.evaluate
+        evaluate=args.evaluate,
+        finetuning= args.finetuning,
+        subsampling=args.subsampling
     )

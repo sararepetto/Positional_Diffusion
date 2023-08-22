@@ -44,17 +44,16 @@ class Skeleton_dataset(pyg_data.Dataset):
 
     def get(self, idx):
         embedding = self.dataset_get_fn(self.dataset[idx])
-        nframes=embedding[0].shape[-1]
+        nframes=embedding.shape[0]
         #frames = torch.cat([self.transforms(img)[None, :] for img in images])
         x = torch.linspace(-1, 1,nframes)
 
         adj_mat = torch.ones(nframes, nframes)
         edge_index, edge_attr = pyg.utils.dense_to_sparse(adj_mat)
-
         data = pyg_data.Data(
             x=x[:, None],
-            original=embedding[0].permute(2,0,1),
-            perturbed=embedding[2].permute(2,0,1),
+            original=embedding,
+            #perturbed=embedding[2].permute(2,0,1),
             labels=embedding[1],
             edge_index=edge_index,
             #img_path=img_path,
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     
     from NTU_60_dt import NTU_60_dt
     from skeletics_dt import Skeletics_dt
-    train_dt = Skeletics_dt()
+    train_dt = NTU_60_dt()
     dt = Skeleton_dataset(train_dt, dataset_get_fn=lambda x: x)
     dl = torch_geometric.loader.DataLoader(dt, batch_size=2)
     dl_iter = iter(dl)
@@ -80,7 +79,6 @@ if __name__ == "__main__":
         k = next(dl_iter)
         breakpoint()
         print(k)
-        print(k.perturbed)
         print(k.batch)
         print(k.batch.unique)
     pass
