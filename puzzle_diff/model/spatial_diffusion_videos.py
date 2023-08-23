@@ -481,7 +481,7 @@ class GNN_Diffusion(pl.LightningModule):
             edge_index=batch.edge_index,
             batch=batch.batch,
         )
-        #torch.save(model.state_dict(), "EFF_GAT.pt")
+        torch.save(self.model.state_dict(), "EFF_GAT.pt")
         if batch_idx == 0 and self.local_rank == 0:
             imgs = self.p_sample_loop(
                 batch.x.shape, batch.frames, batch.edge_index, batch=batch.batch
