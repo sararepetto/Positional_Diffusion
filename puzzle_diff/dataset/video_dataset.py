@@ -49,7 +49,7 @@ class Video_dataset(pyg_data.Dataset):
             x=x[:, None],
             frames=frames,
             edge_index=edge_index,
-            #action = action, 
+            action = action, 
             ind_name=torch.tensor([idx]).long(),
             num_frames=torch.tensor([len(frames)]),
         )

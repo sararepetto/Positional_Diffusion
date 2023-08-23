@@ -44,7 +44,6 @@ def main(
     subsampling
 ):
     ### Define dataset
-
     train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset,subsampling=subsampling)
 
     dl_train = torch_geometric.loader.DataLoader(
@@ -66,7 +65,8 @@ def main(
         else sd.ModelMeanType.START_X,
         warmup_steps=epoch_steps,
         max_train_steps=max_steps,
-        noise_weight=noise_weight
+        noise_weight=noise_weight,
+        finetuning=finetuning
     )
     model.initialize_torchmetrics()
 

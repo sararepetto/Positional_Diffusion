@@ -41,11 +41,13 @@ def main(
     noise_weight,
     checkpoint_path,
     predict_xstart,
-    evaluate
+    evaluate,
+    finetuning,
+    subsampling
 ):
     ### Define dataset
 
-    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset)
+    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset, subsampling=subsampling)
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
@@ -66,7 +68,8 @@ def main(
         else sd.ModelMeanType.START_X,
         warmup_steps=epoch_steps,
         max_train_steps=max_steps,
-        noise_weight=noise_weight
+        noise_weight=noise_weight,
+        finetuning=finetuning
     )
     model.initialize_torchmetrics()
 
@@ -112,6 +115,7 @@ def main(
         test_embedding.append(test_data[i][0])
     test_action = np.concatenate(test_action)
     test_embedding = np.concatenate(test_embedding)
+    
 
     def fit_svm_model(train_embs, train_labels,
         val_embs, val_labels):
@@ -147,6 +151,8 @@ if __name__ == "__main__":
     ap.add_argument("--predict_xstart", type=bool, default=True)
     ap.add_argument("--evaluate", type=bool, default=False)
     ap.add_argument("--noise_weight", type=float, default=0.0)
+    ap.add_argument("--subsampling", type=int, default=3)
+    ap.add_argument("--finetuning", type=bool, default=False)
 
     args = ap.parse_args()
     print(args)
@@ -162,5 +168,7 @@ if __name__ == "__main__":
         checkpoint_path=args.checkpoint_path,
         predict_xstart=args.predict_xstart,
         noise_weight=args.noise_weight,
-        evaluate=args.evaluate
+        evaluate=args.evaluate,
+        subsampling=args.subsampling,
+        finetuning=args.finetuning
     )
