@@ -93,7 +93,7 @@ def main(
         accelerator="gpu",
         devices=gpus,
         strategy="ddp" if gpus > 1 else None,
-        check_val_every_n_epoch=1,
+        check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
         max_epochs = 200
