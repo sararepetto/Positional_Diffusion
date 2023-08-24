@@ -10,6 +10,7 @@ import skvideo.io
 from skimage.transform import resize
 import scipy.io
 import glob
+import random
 
 class PennAction_RGB_dt(Dataset):
     def __init__(self,train=True, subsampling=3):
@@ -69,7 +70,7 @@ class PennAction_RGB_dt(Dataset):
             self.y_coordinates = labels['y']
             imgs = sorted(glob.glob(video_path))
             #for j in range(subsampling):
-            z = torch.randint(0,self.subsampling)
+            z = random.randint(0,self.subsampling)
             self.frames.append(imgs[z::self.subsampling])
             self.actions.append(action_path[z::self.subsampling])
             self.X_coordinates.append(self.x_coordinates[z::self.subsampling])
