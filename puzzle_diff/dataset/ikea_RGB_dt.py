@@ -35,10 +35,11 @@ class Ikea_RGB_dt(Dataset):
                     imgs = sorted(glob.glob(video_path))
                     if len(imgs)== 0:
                         print(self.elements[i])
-                    for z in range(self.subsampling): 
-                        self.frames.append(imgs[z::self.subsampling])
-                        self.actions.append(action_path[z::self.subsampling])
-        breakpoint()
+                    #for z in range(self.subsampling):
+                    z = torch.randint(0,self.subsampling) 
+                    self.frames.append(imgs[z::self.subsampling])
+                    self.actions.append(action_path[z::self.subsampling])
+    
     def __len__(self):
         return len(self.frames)
     
