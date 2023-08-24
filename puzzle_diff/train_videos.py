@@ -18,6 +18,9 @@ from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
 
 import wandb
+import numpy as np
+from sklearn.svm import SVC, LinearSVC
+
 
 
 def get_random_string(length):
@@ -93,6 +96,7 @@ def main(
         check_val_every_n_epoch=1,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
+        max_epochs = 200
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
@@ -102,8 +106,37 @@ def main(
     else:
         trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
    
-    #trainer.test()
+    train_data=trainer.predict(model,train_dt)
+    train_action=[]
+    train_embedding=[]
+    for i in range(len(train_data)):
+        train_action.append(train_data[i][1])
+        train_embedding.append(train_data[i][0])
+    train_action = np.concatenate(train_action)
+    train_embedding = np.concatenate(train_embedding)
+
+    test_data=trainer.predict(model,test_dt)
+    test_action=[]
+    test_embedding=[]
+    for i in range(len(test_data)):
+        test_action.append(test_data[i][1])
+        test_embedding.append(test_data[i][0])
+    test_action = np.concatenate(test_action)
+    test_embedding = np.concatenate(test_embedding)
     
+
+    def fit_svm_model(train_embs, train_labels,
+        val_embs, val_labels):
+        svm_model = SVC(decision_function_shape='ovo', verbose=0)
+        svm_model.fit(train_embs, train_labels)
+        train_acc = svm_model.score(train_embs, train_labels)
+        val_acc = svm_model.score(val_embs, val_labels)
+        return svm_model, train_acc, val_acc
+    
+    results=fit_svm_model(train_embedding,train_action,test_embedding,test_action)
+    
+    model.log('svm_test',results[2])
+    model.log('svm_train',results[1])
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()

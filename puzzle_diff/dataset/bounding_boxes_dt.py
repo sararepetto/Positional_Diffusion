@@ -9,6 +9,7 @@ import math
 from pathlib import Path
 import os 
 import glob
+import re
 
 class Boxes:
     """Detect objects with yolo mothod (V8)
@@ -48,9 +49,14 @@ class Boxes:
         videos_coordinates = []
         zeros = 0
         dev = ['dev1','dev2','dev3']
+        coordinate_path = os.listdir('datasets/Ikea')
+        ready_files = []
+        for i in range (len(coordinate_path)):
+            result = coordinate_path[i][15:int(len(coordinate_path[i])-7)]
+            ready_files.append(result)
 
         for i in range(len(self.list_files)):
-            if self.list_files[i] != '.~lock.Accordo_affiliatura_09.2022_ITA_REPETTO_UNIPADOVA.docx#':
+            if self.list_files[i] != '.~lock.Accordo_affiliatura_09.2022_ITA_REPETTO_UNIPADOVA.docx#' and self.list_files[i] not in ready_files:
                 for j in range(len(dev)):
                     video_coordinate=[]
                     video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.list_files[i]}/{dev[j]}/images/*"
