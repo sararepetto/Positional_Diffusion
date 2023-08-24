@@ -24,8 +24,10 @@ class Video_dataset(pyg_data.Dataset):
         self.dataset_get_fn = dataset_get_fn
 
         self.transforms = transforms.Compose(
-            [
+            [ 
+                transforms.ColorJitter(),
                 transforms.ToTensor(),
+            
             ]
         )
 

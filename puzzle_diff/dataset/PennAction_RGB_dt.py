@@ -69,12 +69,12 @@ class PennAction_RGB_dt(Dataset):
             self.x_coordinates = labels ['x']
             self.y_coordinates = labels['y']
             imgs = sorted(glob.glob(video_path))
-            #for j in range(subsampling):
-            z = random.randint(0,self.subsampling)
-            self.frames.append(imgs[z::self.subsampling])
-            self.actions.append(action_path[z::self.subsampling])
-            self.X_coordinates.append(self.x_coordinates[z::self.subsampling])
-            self.Y_coordinates.append(self.y_coordinates[z::self.subsampling])
+            for j in range(subsampling):
+                #z = random.randint(0,self.subsampling)
+                self.frames.append(imgs[j::self.subsampling])
+                self.actions.append(action_path[j::self.subsampling])
+                self.X_coordinates.append(self.x_coordinates[j::self.subsampling])
+                self.Y_coordinates.append(self.y_coordinates[j::self.subsampling])
 
     def __len__(self):
         return len(self.frames)
