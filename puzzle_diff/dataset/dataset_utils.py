@@ -314,9 +314,9 @@ def get_dataset_videos(dataset:str,subsampling):
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
-    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
-    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
-    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
+    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
+    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x, train=False)
+    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x,train=False)
  
     return train_dt, val_dt, test_dt
 

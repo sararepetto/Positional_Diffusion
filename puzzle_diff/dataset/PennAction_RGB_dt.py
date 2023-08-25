@@ -11,6 +11,7 @@ from skimage.transform import resize
 import scipy.io
 import glob
 import random
+from PIL import Image
 
 class PennAction_RGB_dt(Dataset):
     def __init__(self,train=True, subsampling=3):
@@ -96,6 +97,7 @@ class PennAction_RGB_dt(Dataset):
             image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
             image = cv2.resize(image,(64,64))
             image = torch.from_numpy(image)
+            #image = Image.fromarray(image.astype('uint8'), 'RGB')
             video.append(image) 
         video = torch.stack(video)
         return video,actions
@@ -103,7 +105,7 @@ class PennAction_RGB_dt(Dataset):
 if __name__ == "__main__":
         dt = PennAction_RGB_dt()
         frames=0
-        x= dt[30]
+        x= dt[20]
         print(len(x))
         print(x[0].shape)
         plt.figure()

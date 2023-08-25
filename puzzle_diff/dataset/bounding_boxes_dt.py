@@ -54,16 +54,15 @@ class Boxes:
         for i in range (len(coordinate_path)):
             result = coordinate_path[i][15:int(len(coordinate_path[i])-7)]
             ready_files.append(result)
-        #for i in range(len(self.list_files)):
-           # if self.list_files[i] != '.~lock.Accordo_affiliatura_09.2022_ITA_REPETTO_UNIPADOVA.docx#' and self.list_files[i] not in ready_files:
-        self.list_files = '0030_oak_floor_09_04_2019_08_28_14_17'
-        for j in range(len(dev)):
+        for i in range(len(self.list_files)):
+          if self.list_files[i] != '.~lock.Accordo_affiliatura_09.2022_ITA_REPETTO_UNIPADOVA.docx#':
+            for j in range(len(dev)):
                     video_coordinate=[]
-                    video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.list_files}/{dev[j]}/images/*"                    
+                    video_path = f"/media/sara/Crucial X6/Ikea/Kallax/{self.list_files[i]}/{dev[j]}/images/*"                    
                     #video_path = f"/media/sara/Crucial X6/Ikea/Kallax/0008_black_floor_01_01_2019_08_15_11_18/dev1/images/*"
                     video_path = glob.glob(video_path)
                     for t in range(len(video_path)):
-                        img = cv2.imread(video_path[i])
+                        img = cv2.imread(video_path[t])
                         image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                         self.box = self.boxes.detect(image)
                         if self.box.shape == torch.Size([0]):
@@ -80,17 +79,15 @@ class Boxes:
                             xmax = torch.max(self.box[:,2]) + min(image.shape[1]-torch.max(self.box[:,2]),20)
                             ymax = torch.max(self.box[:,3]) + min(image.shape[0]-torch.max(self.box[:3]),20)
                             coordinate = torch.stack((xmin,ymin,xmax,ymax))
-                        #image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
-                        #plt.imshow(image)
-                        #plt.show()
+                        image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
                         video_coordinate.append(coordinate)
-                        
+            
                      
                     print(self.list_files)
                     print (i)
                     print(dev[j])
                     video_coordinate = torch.stack(video_coordinate, dim = 0)  
-                    torch.save(video_coordinate, f'datasets/Ikea/new_coordinates{self.list_files}{dev[j]}.pt')
+                    torch.save(video_coordinate, f'datasets/Ikea/new_coordinates{self.list_files[i]}{dev[j]}.pt')
                     videos_coordinates.append(video_coordinate)
 
             ##53 frames son senza coordinate 

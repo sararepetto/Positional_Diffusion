@@ -10,12 +10,14 @@ from torch import Tensor
 from torchvision.transforms import InterpolationMode
 from torchvision.transforms import functional as F
 from matplotlib import pyplot as plt
+import torchvision
 
 class Video_dataset(pyg_data.Dataset):
     def __init__(
         self,
         dataset=None,
         dataset_get_fn=lambda x: x,
+        train=True
     ) -> None:
         super().__init__()
 
@@ -23,13 +25,24 @@ class Video_dataset(pyg_data.Dataset):
         self.dataset = dataset
         self.dataset_get_fn = dataset_get_fn
 
-        self.transforms = transforms.Compose(
-            [ 
-                transforms.ColorJitter(),
-                transforms.ToTensor(),
+        if train==True:
+
+            self.transforms = transforms.Compose(
+                [   transforms.ToPILImage(),
+                    transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),
+                    transforms.ToTensor(),
             
-            ]
+                ]
         )
+        else:
+
+            self.transforms = transforms.Compose(
+                [   
+                    transforms.ToTensor(),
+            
+                ]
+        )
+
 
     def len(self) -> int:
         if self.dataset is not None:
@@ -39,9 +52,14 @@ class Video_dataset(pyg_data.Dataset):
 
     def get(self, idx):
         frames,action = self.dataset_get_fn(self.dataset[idx])
+        #if train==True:
+            
         #frames = self.dataset_get_fn(self.dataset[idx]) # Fx C x W x H
         #frames = torch.stack(frames)
+            #PIL = torchvision.transforms.ToPILImage()
         frames = torch.cat([self.transforms(img)[None, :] for img in frames.numpy()])
+        #frames = torch.cat([self.transforms(img)[None, :] for img in frames.numpy()])
+
         #frames = torch.cat([img[None, :] for img in frames])#-> quando voglio lanciare 
         x = torch.linspace(-1, 1, len(frames))
 
@@ -63,7 +81,7 @@ if __name__ == "__main__":
     from PennAction_RGB_dt import PennAction_RGB_dt
 
     train_dt = PennAction_RGB_dt(train = True)
-    dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
+    dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
 
     dl = torch_geometric.loader.DataLoader(dt, batch_size=10)
     dl_iter = iter(dl)

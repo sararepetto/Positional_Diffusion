@@ -43,8 +43,8 @@ class Ikea_RGB_dt(Dataset):
                     z = random.randint(0,self.subsampling) 
                     self.frames.append(imgs[z::self.subsampling])
                     self.actions.append(action_path[z::self.subsampling])
-                    self.coordinates.append(coordinates[z:self.subsampling])
-    
+                    self.coordinates.append(coordinates[z::self.subsampling])
+                    
     def __len__(self):
         return len(self.frames)
     
@@ -63,10 +63,10 @@ class Ikea_RGB_dt(Dataset):
         for i in range(len(imgs)):
             image = cv2.imread(f'{imgs[i]}')
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            xmin = x_min - min(x_min,20)
-            xmax = x_max + min((image.shape[1]-x_max),20)
-            ymin = y_min - min(y_min,20)
-            ymax = y_max + min((image.shape[0]-y_max),20)
+            xmin = x_min #- min(x_min,20)
+            xmax = x_max #+ min((image.shape[1]-x_max),20)
+            ymin = y_min #- min(y_min,20)
+            ymax = y_max #+ min((image.shape[0]-y_max),20)
             image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
             image = cv2.resize(image,(64,64))
             image = torch.from_numpy(image)
@@ -79,7 +79,7 @@ class Ikea_RGB_dt(Dataset):
 if __name__ == "__main__":
         dt = Ikea_RGB_dt()
         frames=0
-        x= dt[50]
+        x= dt[10]
         print(len(x))
         breakpoint()
         print(x[0].shape)
