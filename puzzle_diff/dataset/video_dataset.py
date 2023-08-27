@@ -28,8 +28,8 @@ class Video_dataset(pyg_data.Dataset):
         if train==True:
 
             self.transforms = transforms.Compose(
-                [   transforms.ToPILImage(),
-                    transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),
+                [  # transforms.ToPILImage(),
+                   # transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),
                     transforms.ToTensor(),
             
                 ]
