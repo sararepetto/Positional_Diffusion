@@ -16,7 +16,7 @@ from .text_dataset import Text_dataset
 from .vist_dataset import Vist_dataset
 from .wiki_dt import Wiki_dt
 from .wikiart_dt import Wikiart_DT
-from .PennAction_RGB_dt import PennAction_RGB_dt
+from .PennAction_RGB_dt_new_split import PennAction_RGB_dt
 from .PennAction_POSE_dt import PennAction_POSE_dt
 from .ikea_RGB_dt import Ikea_RGB_dt 
 from .ikea_POSE_dt import Ikea_POSE_dt
