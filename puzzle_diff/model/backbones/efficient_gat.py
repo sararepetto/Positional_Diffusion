@@ -26,7 +26,7 @@ class Eff_GAT(nn.Module):
         self.output_channels = output_channels
         # visual_feats = 448  # hardcoded
 
-        self.combined_features_dim = 4352 + 32 + 32 #visual features + pos_feats + temp_feats
+        self.combined_features_dim = 8704 + 32 + 32 #visual features + pos_feats + temp_feats
 
         # self.gnn_backbone = torch_geometric.nn.models.GAT(
         #     in_channels=self.combined_features_dim,
@@ -124,17 +124,23 @@ class Eff_GAT(nn.Module):
                 feats = self.visual_backbone.forward(patch_rgb)
                 patch_feats = torch.cat(
                     [
+                        feats[1].reshape(patch_rgb.shape[0], -1),
                         feats[2].reshape(patch_rgb.shape[0], -1),
-                        feats[3].reshape(patch_rgb.shape[0], -1),
                     ],
                     -1,
                 )
         else:
             feats = self.visual_backbone.forward(patch_rgb)
             patch_feats = torch.cat(
+                #[
+                   # feats[2].reshape(patch_rgb.shape[0], -1),
+                    #feats[3].reshape(patch_rgb.shape[0], -1),
+                #],
+                #-1,
+            #)
                 [
+                   feats[1].reshape(patch_rgb.shape[0], -1),
                     feats[2].reshape(patch_rgb.shape[0], -1),
-                    feats[3].reshape(patch_rgb.shape[0], -1),
                 ],
                 -1,
             )
