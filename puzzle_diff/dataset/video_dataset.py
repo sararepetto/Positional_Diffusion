@@ -17,23 +17,35 @@ class Video_dataset(pyg_data.Dataset):
         self,
         dataset=None,
         dataset_get_fn=lambda x: x,
-        train=True
+        train=True,
+        augmentation= False
     ) -> None:
         super().__init__()
 
         assert dataset is not None and dataset_get_fn is not None
         self.dataset = dataset
+        self.augmentation = augmentation
         self.dataset_get_fn = dataset_get_fn
 
         if train==True:
+            
+            if self.augmentation==True:
 
-            self.transforms = transforms.Compose(
-                [   transforms.ToPILImage(),
-                    transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),
+                self.transforms = transforms.Compose(
+                    [   transforms.ToPILImage(),
+                        transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),
+                        transforms.ToTensor(),
+            
+                    ]
+        )   
+            else: 
+                self.transforms = transforms.Compose(
+                [   
                     transforms.ToTensor(),
             
                 ]
-        )
+            )
+                
         else:
 
             self.transforms = transforms.Compose(
