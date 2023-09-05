@@ -301,7 +301,7 @@ def get_dataset_skeletons(dataset: str):
 
     return train_dt, val_dt, test_dt
 
-def get_dataset_videos(dataset:str,subsampling):
+def get_dataset_videos(dataset:str,subsampling, augmentation):
     if dataset == 'ntu':
         train_dt = ntu_RGB_dt(train = True)
         test_dt = ntu_RGB_dt(train = False)
@@ -314,28 +314,28 @@ def get_dataset_videos(dataset:str,subsampling):
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
-    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
-    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x, train=False)
-    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x,train=False)
+    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, train=True, augmentation = augmentation)
+    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x, train=False, augmentation = augmentation)
+    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x,train=False, augmentation = augmentation)
  
     return train_dt, val_dt, test_dt
 
-def get_dataset_pose(dataset:str):
+def get_dataset_pose(dataset:str,subsampling, augmentation):
     if dataset == 'ntu':
         train_dt = ntu_POSE_dt(train = True)
         test_dt = ntu_POSE_dt(train = False)
     elif dataset == 'pennaction':
-        train_dt = PennAction_POSE_dt(train = True)
-        test_dt = PennAction_POSE_dt(train = False)
+        train_dt = PennAction_POSE_dt(train = True,subsampling = subsampling)
+        test_dt = PennAction_POSE_dt(train = False, subsampling = subsampling)
     elif dataset == 'ikea':
         train_dt =Ikea_POSE_dt(train = True)
         test_dt = Ikea_POSE_dt(train = False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
-    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x)
-    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
-    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x)
+    train_dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, augmentation = augmentation)
+    val_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation)
+    test_dt = Video_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation)
  
     return train_dt, val_dt, test_dt
 
