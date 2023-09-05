@@ -23,7 +23,6 @@ class Eff_GAT_POSE(nn.Module):
 
     def __init__(self, steps, input_channels=2, output_channels=2) -> None:
         super().__init__()
-
         self.visual_backbone = embedding ()
         self.input_channels = input_channels
         self.output_channels = output_channels
