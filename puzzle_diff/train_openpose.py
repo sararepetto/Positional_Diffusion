@@ -38,10 +38,12 @@ def main(
     offline,
     checkpoint_path,
     predict_xstart,
+    subsampling,
+    augmentation,
 ):
     ### Define dataset
 
-    train_dt, val_dt, test_dt = get_dataset_pose(dataset=dataset)
+    train_dt, val_dt, test_dt = get_dataset_pose(dataset=dataset, subsampling = subsampling, augmentation = augmentation )
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
@@ -107,9 +109,11 @@ if __name__ == "__main__":
     ap.add_argument("--offline", action="store_true", default=False)
     ap.add_argument("--checkpoint_path", type=str, default="")
     ap.add_argument("--predict_xstart", type=bool, default=True)
-    
+    ap.add_argument("--subsampling", type=int, default= 3)
+    ap.add_argument("--augmentation", type=bool, default= False)
     args = ap.parse_args()
     print(args)
+
     main(
         batch_size=args.batch_size,
         gpus=args.gpus,
@@ -121,4 +125,6 @@ if __name__ == "__main__":
         offline=args.offline,
         checkpoint_path=args.checkpoint_path,
         predict_xstart=args.predict_xstart,
+        subsampling = args.subsampling,
+        augmentation = args.augmentation
     )
