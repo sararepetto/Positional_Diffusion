@@ -44,10 +44,11 @@ def main(
     predict_xstart,
     evaluate,
     finetuning,
-    subsampling
+    subsampling,
+    augmentation
 ):
     ### Define dataset
-    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset,subsampling=subsampling)
+    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset,subsampling=subsampling, augmentation=augmentation)
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
@@ -155,7 +156,8 @@ if __name__ == "__main__":
     ap.add_argument("--evaluate", type=bool, default=False)
     ap.add_argument("--noise_weight", type=float, default=0.0)
     ap.add_argument("--finetuning", type=bool, default=False)
-    ap.add_argument("--subsampling", type=int, default=3)
+    ap.add_argument("--subsampling", type=int, default = 3)
+    ap.add_argument("--augmentation", type=bool, default = False)
 
     args = ap.parse_args()
     print(args)
@@ -173,5 +175,6 @@ if __name__ == "__main__":
         noise_weight=args.noise_weight,
         evaluate=args.evaluate,
         finetuning= args.finetuning,
-        subsampling=args.subsampling
+        subsampling=args.subsampling,
+        augmentation=args.augmentation
     )
