@@ -87,8 +87,8 @@ class Boxes:
                     print (i)
                     print(dev[j])
                     video_coordinate = torch.stack(video_coordinate, dim = 0)  
-                    torch.save(video_coordinate, f'datasets/Ikea/new_coordinates{self.list_files[i]}{dev[j]}.pt')
-                    videos_coordinates.append(video_coordinate)
+                    #torch.save(video_coordinate, f'datasets/Ikea/new_coordinates{self.list_files[i]}{dev[j]}.pt')
+                    #videos_coordinates.append(video_coordinate)
 
             ##53 frames son senza coordinate 
             #indeces.append(i)
@@ -99,7 +99,7 @@ class Boxes:
             #video[i] = torch.from_numpy(video[i])
         #video = torch.stack(video)
         #video= video[::10]
-        
+        print(zeros)
         return videos_coordinates, zeros
 
     

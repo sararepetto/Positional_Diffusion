@@ -19,14 +19,16 @@ class Eff_GAT(nn.Module):
     def __init__(self, steps, input_channels=2, output_channels=2, finetuning=False) -> None:
         super().__init__()
         self.finetuning = finetuning
-        self.visual_backbone = timm.create_model(
-            "efficientnet_b0", pretrained= True, features_only=True
-        )
+        #self.visual_backbone = timm.create_model(
+            #"efficientnet_b0", pretrained= True, features_only=True
+        #)
+        self.visual_backbone =  torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+
         self.input_channels = input_channels
         self.output_channels = output_channels
         # visual_feats = 448  # hardcoded
 
-        self.combined_features_dim = 8704 + 32 + 32 #visual features + pos_feats + temp_feats
+        self.combined_features_dim = 384 + 32 + 32 #visual features + pos_feats + temp_feats
 
         # self.gnn_backbone = torch_geometric.nn.models.GAT(
         #     in_channels=self.combined_features_dim,
@@ -121,14 +123,15 @@ class Eff_GAT(nn.Module):
         patch_rgb = (patch_rgb - self.mean) / self.std
         if self.finetuning == False:
             with torch.no_grad():         
-                feats = self.visual_backbone.forward(patch_rgb)
-                patch_feats = torch.cat(
-                    [
-                        feats[1].reshape(patch_rgb.shape[0], -1),
-                        feats[2].reshape(patch_rgb.shape[0], -1),
-                    ],
-                    -1,
-                )
+                patch_feats = self.visual_backbone.forward(patch_rgb)
+               
+                #patch_feats = torch.cat(
+                    #[
+                       # feats[1].reshape(patch_rgb.shape[0], -1),
+                       # feats[2].reshape(patch_rgb.shape[0], -1),
+                    #],
+                    #-1,
+                #)
         else:
             feats = self.visual_backbone.forward(patch_rgb)
             patch_feats = torch.cat(
