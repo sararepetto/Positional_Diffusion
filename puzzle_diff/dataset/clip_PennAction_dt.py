@@ -14,7 +14,7 @@ import random
 from PIL import Image
 import string
 
-class PennAction_RGB_dt(Dataset):
+class PennAction_clip_dt(Dataset):
     def __init__(self,train=True, clip_len =10, interval = 4, tuple_len = 3, subsampling=3):
         super().__init__()
         self.subsampling = subsampling

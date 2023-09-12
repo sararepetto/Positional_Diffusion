@@ -12,7 +12,7 @@ import random
 import string
 
 import pytorch_lightning as pl
-from dataset.dataset_utils import get_dataset_videos
+from dataset.dataset_utils import get_dataset_clip
 from model import spatial_diffusion_clip as sd 
 from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
@@ -48,7 +48,7 @@ def main(
     augmentation
 ):
     ### Define dataset
-    train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset,subsampling=subsampling, augmentation=augmentation)
+    train_dt, val_dt, test_dt = get_dataset_clip(dataset=dataset,subsampling=subsampling, augmentation=augmentation)
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True

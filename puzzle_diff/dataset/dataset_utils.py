@@ -20,6 +20,7 @@ from .PennAction_RGB_dt_new_split import PennAction_RGB_dt
 from .PennAction_POSE_dt import PennAction_POSE_dt
 from .ikea_RGB_dt import Ikea_RGB_dt 
 from .ikea_POSE_dt import Ikea_POSE_dt
+from .clip_PennAction_dt import PennAction_clip_dt
 ALLOWED_DT = ["celeba", "cifar100", "wikiart"]
 ALLOWED_TEXT = ["nips", "sind", "roc", "wiki"]
 
@@ -339,3 +340,10 @@ def get_dataset_pose(dataset:str,subsampling, augmentation):
  
     return train_dt, val_dt, test_dt
 
+def get_dataset_clip (dataset:str,augmentation):
+    if dataset == 'pennaction':
+        train_dt = PennAction_clip_dt(train = True)
+        test_dt = PennAction_clip_dt(test = True)
+    else:
+        raise Exception(f"Dataset {dataset} is not provided.")
+    
