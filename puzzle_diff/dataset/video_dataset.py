@@ -71,7 +71,6 @@ class Video_dataset(pyg_data.Dataset):
             #PIL = torchvision.transforms.ToPILImage()
         frames = torch.cat([self.transforms(img)[None, :] for img in frames.numpy()])
         #frames = torch.cat([self.transforms(img)[None, :] for img in frames.numpy()])
-
         #frames = torch.cat([img[None, :] for img in frames])#-> quando voglio lanciare 
         x = torch.linspace(-1, 1, len(frames))
 

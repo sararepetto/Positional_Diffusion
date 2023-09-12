@@ -75,6 +75,7 @@ class PennAction_RGB_dt(Dataset):
                 imgs = sorted(glob.glob(video_path))
                 for j in range(subsampling):
                 #z = random.randint(0,self.subsampling)
+                    ##[j*subsampling:(j+1)*subsampling]
                     self.frames.append(imgs[j::self.subsampling])
                     self.actions.append(phases[j::self.subsampling])
                     self.X_coordinates.append(self.x_coordinates[j::self.subsampling])
