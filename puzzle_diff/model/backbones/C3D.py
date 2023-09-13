@@ -94,8 +94,8 @@ class C3D(nn.Module):
             return x.view(x.shape[0], -1)
 
         x = self.pool5(x)
-        
-       # x = x.view(-1, 512)
+
+        x = x.view(-1, 512)
 
         
         return x

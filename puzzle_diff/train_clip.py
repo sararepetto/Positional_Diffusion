@@ -48,7 +48,8 @@ def main(
     augmentation
 ):
     ### Define dataset
-    train_dt, val_dt, test_dt = get_dataset_clip(dataset=dataset,subsampling=subsampling, augmentation=augmentation)
+    train_dt, val_dt, test_dt = get_dataset_clip(dataset=dataset, augmentation=augmentation)
+
 
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True

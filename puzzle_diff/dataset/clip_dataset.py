@@ -74,7 +74,7 @@ class Clip_dataset(pyg_data.Dataset):
               frame = torch.cat([self.transforms(img)[None, :] for img in frames[i].numpy()])
               new_frames.append(frame)
         new_frames = torch.stack(new_frames)
-        new_frames = new_frames.permute(0,2,1,3,4) 
+        #new_frames = new_frames.permute(0,2,1,3,4) 
         #frames = torch.cat([self.transforms(img)[None, :] for img in frames.numpy()])
 
         #frames = torch.cat([img[None, :] for img in frames])#-> quando voglio lanciare 
@@ -95,9 +95,9 @@ class Clip_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from clip_PennAction_dt import PennAction_RGB_dt
+    from clip_PennAction_dt import PennAction_clip_dt
 
-    train_dt = PennAction_RGB_dt(train = True)
+    train_dt = PennAction_clip_dt(train = False)
     dt = Clip_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
 
     dl = torch_geometric.loader.DataLoader(dt, batch_size=10)
@@ -106,5 +106,6 @@ if __name__ == "__main__":
     for i in range(5):
         k = next(dl_iter)
         print(k)
+        breakpoint()
 
         
