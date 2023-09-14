@@ -44,11 +44,15 @@ class IKEA_clip_dt(Dataset):
                     action_path = [k for k in data.tolist()[self.elements[i]]['labels']]
                     #self.coordinate_path = f'datasets/Ikea/new_coordinates{self.elements[i]}{dev[j]}.pt'
                     #coordinates = torch.load(self.coordinate_path)
+                     #for z in range(self.subsampling):
                     imgs = sorted(glob.glob(video_path))
-                    if len(imgs)== 0:
-                        print(self.elements[i])
-                    self.frames.append(imgs)
-                    self.actions.append(action_path)
+                    z = random.randint(0,self.subsampling) 
+                    self.frames.append(imgs[z::self.subsampling])
+                    self.actions.append(action_path[z::self.subsampling])
+                    #self.coordinates.append(coordinates[z::self.subsampling])
+                    
+                    # self.frames.append(imgs)
+                    #self.actions.append(action_path)
                     #self.coordinates.append(coordinates)
 
 
