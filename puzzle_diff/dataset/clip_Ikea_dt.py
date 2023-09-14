@@ -95,7 +95,7 @@ class IKEA_clip_dt(Dataset):
                 #ymin = np.min(tuple_Ycoordinates[i][j]) - min(np.min(tuple_Ycoordinates[i][j]),20)
                 #ymax = np.max (tuple_Ycoordinates[i][j]) + min((image.shape[0]-np.max(tuple_Ycoordinates[i][j])),20)
                 #image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
-                #image = cv2.resize(image,(70,70))
+                image = cv2.resize(image,(150,150))
                 image = torch.from_numpy(image)
             #image = Image.fromarray(image.astype('uint8'), 'RGB')
                 video.append(image)
