@@ -80,7 +80,7 @@ class IKEA_clip_dt(Dataset):
             tuple_clip.append(clip)
             #tuple_Xcoordinates.append(X_coordinates)
             #tuple_Ycoordinates.append(Y_coordinates)
-            #clip_start = clip_start + self.clip_len + self.interval
+            clip_start = clip_start + self.clip_len + self.interval
 
         videos=[]
         for i in range(len(tuple_clip)):
