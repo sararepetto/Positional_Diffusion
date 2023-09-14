@@ -22,7 +22,7 @@ from .ikea_RGB_dt import Ikea_RGB_dt
 from .ikea_POSE_dt import Ikea_POSE_dt
 from .clip_PennAction_dt import PennAction_clip_dt
 from .clip_dataset import Clip_dataset
-from .clip_ikea_dt import IKEA_clip_dt
+from .clip_Ikea_dt import IKEA_clip_dt
 
 ALLOWED_DT = ["celeba", "cifar100", "wikiart"]
 ALLOWED_TEXT = ["nips", "sind", "roc", "wiki"]
