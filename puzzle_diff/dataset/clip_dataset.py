@@ -65,7 +65,6 @@ class Clip_dataset(pyg_data.Dataset):
     def get(self, idx):
         frames,action = self.dataset_get_fn(self.dataset[idx])
         #if train==True:
-            
         #frames = self.dataset_get_fn(self.dataset[idx]) # Fx C x W x H
         #frames = torch.stack(frames)
             #PIL = torchvision.transforms.ToPILImage()
@@ -95,9 +94,9 @@ class Clip_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from clip_PennAction_dt import PennAction_clip_dt
+    from UCF101_clip_dt import UCF101_clip_dt
 
-    train_dt = PennAction_clip_dt(train = False)
+    train_dt = UCF101_clip_dt(train = False)
     dt = Clip_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
 
     dl = torch_geometric.loader.DataLoader(dt, batch_size=10)
@@ -106,6 +105,5 @@ if __name__ == "__main__":
     for i in range(5):
         k = next(dl_iter)
         print(k)
-        breakpoint()
 
         

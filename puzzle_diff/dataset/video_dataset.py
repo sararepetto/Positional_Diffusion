@@ -65,7 +65,6 @@ class Video_dataset(pyg_data.Dataset):
     def get(self, idx):
         frames,action = self.dataset_get_fn(self.dataset[idx])
         #if train==True:
-            
         #frames = self.dataset_get_fn(self.dataset[idx]) # Fx C x W x H
         #frames = torch.stack(frames)
             #PIL = torchvision.transforms.ToPILImage()
@@ -89,9 +88,9 @@ class Video_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from PennAction_RGB_dt import PennAction_RGB_dt
+    from UCF101_clip_dt import UCF101_clip_dt
 
-    train_dt = PennAction_RGB_dt(train = True)
+    train_dt = UCF101_clip_dt(train = True)
     dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
 
     dl = torch_geometric.loader.DataLoader(dt, batch_size=10)

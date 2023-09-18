@@ -23,6 +23,7 @@ from .ikea_POSE_dt import Ikea_POSE_dt
 from .clip_PennAction_dt import PennAction_clip_dt
 from .clip_dataset import Clip_dataset
 from .clip_Ikea_dt import IKEA_clip_dt
+from .UCF101_clip_dt import UCF101_clip_dt
 
 ALLOWED_DT = ["celeba", "cifar100", "wikiart"]
 ALLOWED_TEXT = ["nips", "sind", "roc", "wiki"]
@@ -352,6 +353,11 @@ def get_dataset_clip (dataset:str,augmentation):
         train_dt = IKEA_clip_dt(train=True)
         test_dt = IKEA_clip_dt(train=False)
         val_dt = IKEA_clip_dt(train=False)
+    if dataset == 'UCF101':
+        #train_dataset, val_dataset = random_split(train_dataset, (len(train_dataset)-800, 800))
+        train_dt = UCF101_clip_dt(train=True)
+        test_dt = UCF101_clip_dt(train=False)
+        val_dt = UCF101_clip_dt(train=False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
