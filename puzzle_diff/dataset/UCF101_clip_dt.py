@@ -76,6 +76,25 @@ class UCF101_clip_dt(Dataset):
             length, height, width, channel = videodata.shape
             tuple_clip = []
             all_idx = []
+            if self.train:
+                self.transform = transforms.Compose(
+                    [    
+                         transforms.ToPILImage(),
+                         transforms.Resize((128, 171)),
+                         transforms.RandomCrop(112),
+                         transforms.ToTensor(),
+            
+                    ]
+                )
+            else:
+                 self.transform = transforms.Compose(
+                    [    transforms.ToPILImage(),
+                         transforms.Resize((128, 171)),
+                         transforms.CenterCrop(112),
+                         transforms.ToTensor(),
+            
+                    ]
+                 )
             tuple_order = list(range(0, self.tuple_len))
             if self.train:
                 tuple_start = random.randint(0, length - self.tuple_total_frames)
@@ -87,10 +106,9 @@ class UCF101_clip_dt(Dataset):
             for _ in range(self.tuple_len):
                 trans_clip = []
                 clip = videodata[clip_start: clip_start + self.clip_len]
+                seed = random.random()
                 for frame in clip:
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame = cv2.resize(frame,(112,112))
-                    self.transform = transforms.ToTensor()
                     frame = self.transform(frame)
                     trans_clip.append(frame)
                 clip = torch.stack(trans_clip)
