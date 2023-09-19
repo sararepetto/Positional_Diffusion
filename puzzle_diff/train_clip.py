@@ -20,7 +20,33 @@ from pytorch_lightning.loggers import WandbLogger
 import wandb
 import numpy as np
 from sklearn.svm import SVC, LinearSVC
+import torch.nn as nn
+import torch.optim as optim
 
+#classe(backbone,num_classes):
+#backbone+mlp
+class Classification(nn.Module):
+    def __init__(self,backbone,num_classes):
+        super().__init__()
+        self.backbone = backbone
+        self.num_classes = num_classes
+        self.linear = nn.Linear(512, self.num_classes)
+    
+    def forward(self,x):
+        x = self.backbone.forward(x)
+        x = self.linear(x)
+        return x
+    
+    def configure_optimizers(self):
+        optimizer = optim.SGD(self.parameters(), lr=1e-3, momentum=9e-1, weight_decay=5e-4)
+        return optimizer
+    
+    def training_step(self, train_batch, batch_idx):
+        input,target = train_batch
+        output = self.forward(input)
+        criterion = nn.CrossEntropyLoss()
+        loss = criterion(output,target)
+        
 
 
 def get_random_string(length):
@@ -108,6 +134,7 @@ def main(
     else:
         trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
    
+    #model.model.visual_backbone->rete addestrata 
     train_data=trainer.predict(model,train_dt)
     train_action=[]
     train_embedding=[]

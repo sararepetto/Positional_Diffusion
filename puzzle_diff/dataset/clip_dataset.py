@@ -30,10 +30,6 @@ class Clip_dataset(pyg_data.Dataset):
         if train==True:
             
             if self.augmentation==True:
-    # train_transforms = transforms.Compose([
-    #     transforms.Resize((128, 171)),
-    #     transforms.RandomCrop(112),
-    #     transforms.ToTensor()])
                 self.transforms = transforms.Compose(
                     [   transforms.ToPILImage(),
                         transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),

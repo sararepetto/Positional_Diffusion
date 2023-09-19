@@ -108,6 +108,7 @@ class UCF101_clip_dt(Dataset):
                 clip = videodata[clip_start: clip_start + self.clip_len]
                 seed = random.random()
                 for frame in clip:
+                    random.seed(seed)
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frame = self.transform(frame)
                     trans_clip.append(frame)
