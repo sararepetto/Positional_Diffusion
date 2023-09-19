@@ -34,7 +34,7 @@ class Video_dataset(pyg_data.Dataset):
                 self.transforms = transforms.Compose(
                     [   transforms.ToPILImage(),
                         transforms.ColorJitter(brightness=(0.5,1.5),contrast=(0.5),saturation=(0.5,1.5),hue=(-0.1,0.1)),
-                        transforms.RandomCrop(60),
+                        transforms.RandomCrop(70),
                         transforms.ToTensor(),
             
                     ]
@@ -42,6 +42,7 @@ class Video_dataset(pyg_data.Dataset):
             else: 
                 self.transforms = transforms.Compose(
                 [   
+                    transforms.CenterCrop(70),
                     transforms.ToTensor(),
             
                 ]

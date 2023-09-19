@@ -99,7 +99,7 @@ class PennAction_RGB_dt(Dataset):
             ymin = np.min(y_coordinates[i]) - min(np.min(y_coordinates[i]),20)
             ymax = np.max (y_coordinates[i]) + min((image.shape[0]-np.max(y_coordinates[i])),20)
             image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
-            image = cv2.resize(image,(70,70))
+            image = cv2.resize(image,(84,84))
             image = torch.from_numpy(image)
             #image = Image.fromarray(image.astype('uint8'), 'RGB')
             video.append(image) 
