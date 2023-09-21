@@ -13,6 +13,7 @@ import string
 
 import pytorch_lightning as pl
 from dataset.dataset_utils import get_dataset_clip
+from dataset.dataset_utils import get_dataset_class
 from model import spatial_diffusion_clip as sd 
 from pytorch_lightning.callbacks import ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
@@ -22,17 +23,30 @@ import numpy as np
 from sklearn.svm import SVC, LinearSVC
 import torch.nn as nn
 import torch.optim as optim
+import torch 
+import torchmetrics
 
 #classe(backbone,num_classes):
 #backbone+mlp
-class Classification(nn.Module):
+class Classification(pl.LightningModule):
     def __init__(self,backbone,num_classes):
         super().__init__()
         self.backbone = backbone
         self.num_classes = num_classes
         self.linear = nn.Linear(512, self.num_classes)
     
+    def initialize_torchmetrics(self):
+        metrics = {}
+
+        metrics["accuracy"] = torchmetrics.MeanMetric()
+        metrics["tau"] = torchmetrics.MeanMetric()
+        metrics["pmr"] = torchmetrics.MeanMetric()
+        metrics["overall_nImages"] = torchmetrics.SumMetric()
+        breakpoint()
+        self.metrics = nn.ModuleDict(metrics)
+        
     def forward(self,x):
+        x = x.permute(0,2,1,3,4)
         x = self.backbone.forward(x)
         x = self.linear(x)
         return x
@@ -42,11 +56,35 @@ class Classification(nn.Module):
         return optimizer
     
     def training_step(self, train_batch, batch_idx):
-        input,target = train_batch
+        input = train_batch.frames
+        target = train_batch.action
         output = self.forward(input)
         criterion = nn.CrossEntropyLoss()
         loss = criterion(output,target)
-        
+        self.log("action_loss", loss)
+        return loss
+    
+    def validation_step(self, val_batch, batch_idx):
+        with torch.no_grad():
+            n=0
+            input= val_batch.frames
+            target= val_batch.action
+            output = self.forward(input)
+            for i in range(val_batch.batch.max() + 1):
+                n+=1
+                breakpoint()
+                new_output = output[val_batch.batch == i]
+                new_output = torch.mean(new_output, dim = 0)
+                pts = torch.argmax(new_output)
+                match = (target[i] ==pts)
+                acc = match.float().mean()
+            #correct += torch.sum(targets == pts).item()
+                self.metrics["accuracy"].update(acc)
+            self.log_dict(self.metrics)
+
+    def validation_epoch_end(self, outputs) -> None:
+        self.log_dict(self.metrics)
+
 
 
 def get_random_string(length):
@@ -75,13 +113,18 @@ def main(
 ):
     ### Define dataset
     train_dt, val_dt, test_dt = get_dataset_clip(dataset=dataset, augmentation=augmentation)
-
-
+    train_acc_dt,val_acc_dt, test_acc_dt = get_dataset_class(dataset=dataset, augmentation = augmentation)
     dl_train = torch_geometric.loader.DataLoader(
         train_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
     )
     dl_test = torch_geometric.loader.DataLoader(
         test_dt, batch_size=batch_size, num_workers=num_workers, shuffle=False
+    )
+    acc_dl_train = torch_geometric.loader.DataLoader(
+        train_acc_dt, batch_size=batch_size, num_workers=num_workers, shuffle=True
+    )
+    acc_dl_test = torch_geometric.loader.DataLoader(
+        test_acc_dt, batch_size=batch_size, num_workers=num_workers, shuffle=False
     )
 
     epoch_steps = len(dl_train) * 10
@@ -124,7 +167,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 200
+        max_epochs = 1
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
@@ -133,7 +176,21 @@ def main(
         trainer.test(model, dl_test)
     else:
         trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
-   
+
+    acc_model = Classification(model.model.visual_backbone,num_classes=101)
+    acc_model.initialize_torchmetrics()
+
+    trainer_acc = pl.Trainer(
+        accelerator="gpu",
+        devices=gpus,
+        strategy="ddp" if gpus > 1 else None,
+        check_val_every_n_epoch=10,
+        logger=wandb_logger,
+        callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
+        max_epochs = 1
+    )
+
+    trainer_acc.fit(acc_model,acc_dl_train,acc_dl_test,ckpt_path=checkpoint_path)
     #model.model.visual_backbone->rete addestrata 
     train_data=trainer.predict(model,train_dt)
     train_action=[]

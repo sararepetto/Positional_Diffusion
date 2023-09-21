@@ -42,7 +42,7 @@ class Video_dataset(pyg_data.Dataset):
             else: 
                 self.transforms = transforms.Compose(
                 [   
-                    transforms.CenterCrop(70),
+        
                     transforms.ToTensor(),
             
                 ]
@@ -90,9 +90,9 @@ class Video_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from UCF101_clip_dt import UCF101_clip_dt
+    from UCF101_frames_dt import UCF101_frames_dt
 
-    train_dt = UCF101_clip_dt(train = True)
+    train_dt = UCF101_frames_dt(train = True)
     dt = Video_dataset(train_dt, dataset_get_fn=lambda x: x, train=True)
 
     dl = torch_geometric.loader.DataLoader(dt, batch_size=10)

@@ -743,7 +743,7 @@ class GNN_Diffusion(pl.LightningModule):
                 pred_ass = greedy_cost_assignment(pos, real_grid)
                 sort_idx = torch.sort(pred_ass[:, 0])[1]
                 pred_ass = pred_ass[sort_idx]
-
+                
                 correct = (gt_ass[:, 1] == pred_ass[:, 1]).all()
 
                 piece_accuracy = (gt_ass[:, 1] == pred_ass[:, 1]).to(self.device)

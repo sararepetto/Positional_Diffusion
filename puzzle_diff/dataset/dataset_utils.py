@@ -24,6 +24,9 @@ from .clip_PennAction_dt import PennAction_clip_dt
 from .clip_dataset import Clip_dataset
 from .clip_Ikea_dt import IKEA_clip_dt
 from .UCF101_clip_dt import UCF101_clip_dt
+from .UCF101_class import UCF101Dataset
+from .UCF101_frames_dt import UCF101_frames_dt
+import torch_geometric
 
 ALLOWED_DT = ["celeba", "cifar100", "wikiart"]
 ALLOWED_TEXT = ["nips", "sind", "roc", "wiki"]
@@ -316,6 +319,11 @@ def get_dataset_videos(dataset:str,subsampling, augmentation):
     elif dataset == 'ikea':
         train_dt =Ikea_RGB_dt(train = True,subsampling = subsampling)
         test_dt = Ikea_RGB_dt(train = False,subsampling = subsampling)
+    elif dataset == 'UCF101':
+        #train_dataset, val_dataset = random_split(train_dataset, (len(train_dataset)-800, 800))
+        train_dt = UCF101_frames_dt(train=True)
+        test_dt = UCF101_frames_dt(train=False)
+        val_dt = UCF101_frames_dt(train=False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
@@ -361,6 +369,19 @@ def get_dataset_clip (dataset:str,augmentation):
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
     
+    train_dt = Clip_dataset(train_dt, dataset_get_fn=lambda x: x, augmentation = augmentation,train=True)
+    val_dt = Clip_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation,train=False)
+    test_dt = Clip_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation,train=False)
+    return train_dt,val_dt, test_dt
+
+def get_dataset_class(dataset:str,augmentation):
+    if dataset == 'UCF101':
+        #train_dataset, val_dataset = random_split(train_dataset, (len(train_dataset)-800, 800))
+        train_dt = UCF101Dataset(train=True)
+        test_dt = UCF101Dataset(train=False)
+        val_dt = UCF101Dataset(train=False)
+    else:
+        raise Exception(f"Dataset {dataset} is not provided.")
     train_dt = Clip_dataset(train_dt, dataset_get_fn=lambda x: x, augmentation = augmentation)
     val_dt = Clip_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation)
     test_dt = Clip_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation)

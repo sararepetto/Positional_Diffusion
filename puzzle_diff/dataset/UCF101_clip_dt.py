@@ -76,26 +76,7 @@ class UCF101_clip_dt(Dataset):
             length, height, width, channel = videodata.shape
             tuple_clip = []
             all_idx = []
-            if self.train:
-                self.transform = transforms.Compose(
-                    [    
-                         transforms.ToPILImage(),
-                         transforms.Resize((128, 171)),
-                         transforms.RandomCrop(112),
-                         transforms.ToTensor(),
-            
-                    ]
-                )
-            else:
-                 self.transform = transforms.Compose(
-                    [    transforms.ToPILImage(),
-                         transforms.Resize((128, 171)),
-                         transforms.CenterCrop(112),
-                         transforms.ToTensor(),
-            
-                    ]
-                 )
-            tuple_order = list(range(0, self.tuple_len))
+
             if self.train:
                 tuple_start = random.randint(0, length - self.tuple_total_frames)
             else:
@@ -104,18 +85,45 @@ class UCF101_clip_dt(Dataset):
             # random select a clip for train
             clip_start = tuple_start
             for _ in range(self.tuple_len):
-                trans_clip = []
                 clip = videodata[clip_start: clip_start + self.clip_len]
+                tuple_clip.append(clip)
+                clip_start = clip_start + self.clip_len + self.interval
+
+            trans_tuple = []
+            for clip in tuple_clip:
+                trans_clip = []
+                # fix seed, apply the sample `random transformation` for all frames in the clip 
                 seed = random.random()
                 for frame in clip:
                     random.seed(seed)
+                    if self.train:
+                        self.transform = transforms.Compose(
+                        [    
+                         transforms.ToPILImage(),
+                         transforms.Resize((128, 171)),
+                         transforms.RandomCrop(112),
+                         transforms.ToTensor(),
+            
+                        ]
+                    )
+                    else:
+                        self.transform = transforms.Compose(
+                        [    
+                         transforms.ToPILImage(),
+                         transforms.Resize((128, 171)),
+                         transforms.CenterCrop(112),
+                         transforms.ToTensor(),
+            
+                        ]
+                    )
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frame = self.transform(frame)
                     trans_clip.append(frame)
                 clip = torch.stack(trans_clip)
-                tuple_clip.append(clip)
+                trans_tuple.append(clip)
                 all_idx.append(torch.tensor(int(class_idx)))
-                clip_start = clip_start + self.clip_len + self.interval
+                #clip_start = clip_start + self.clip_len + self.interval
+            tuple_clip = trans_tuple
             tuple_clip = torch.stack(tuple_clip).permute(0,1,3,4,2)
             return tuple_clip,all_idx
            
@@ -124,9 +132,10 @@ class UCF101_clip_dt(Dataset):
         
 
 if __name__ == "__main__":
-        dt = UCF101_clip_dt()           
+        dt = UCF101_clip_dt(train=False)           
         frames=0
         x= dt[20]
+        breakpoint()
         print(len(x))
         plt.figure()
         plt.imshow(x[0][0][0])
