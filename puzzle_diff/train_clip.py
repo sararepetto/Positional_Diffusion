@@ -42,7 +42,6 @@ class Classification(pl.LightningModule):
         metrics["tau"] = torchmetrics.MeanMetric()
         metrics["pmr"] = torchmetrics.MeanMetric()
         metrics["overall_nImages"] = torchmetrics.SumMetric()
-        breakpoint()
         self.metrics = nn.ModuleDict(metrics)
         
     def forward(self,x):
@@ -72,7 +71,6 @@ class Classification(pl.LightningModule):
             output = self.forward(input)
             for i in range(val_batch.batch.max() + 1):
                 n+=1
-                breakpoint()
                 new_output = output[val_batch.batch == i]
                 new_output = torch.mean(new_output, dim = 0)
                 pts = torch.argmax(new_output)
