@@ -59,6 +59,7 @@ class Classification(pl.LightningModule):
         target = train_batch.action
         output = self.forward(input)
         criterion = nn.CrossEntropyLoss()
+        breakpoint()
         loss = criterion(output,target)
         self.log("action_loss", loss)
         return loss
