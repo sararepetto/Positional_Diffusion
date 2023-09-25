@@ -130,11 +130,11 @@ class UCF101Dataset(Dataset):
                 clip = torch.stack(trans_clip).permute([0, 2, 3, 1])
                 all_clips.append(clip)
                 all_idx.append(torch.tensor(int(class_idx)))
-            return torch.stack(all_clips), torch.tensor(int(class_idx))
+            return torch.stack(all_clips), torch.tensor(int(class_idx)-1)
         
 
 if __name__ == "__main__":
-        dt = UCF101Dataset(train = False)           
+        dt = UCF101Dataset(train = True)           
         frames=0
         x= dt[20]
         breakpoint()

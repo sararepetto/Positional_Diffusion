@@ -59,7 +59,6 @@ class Classification(pl.LightningModule):
         target = train_batch.action
         output = self.forward(input)
         criterion = nn.CrossEntropyLoss()
-        breakpoint()
         loss = criterion(output,target)
         self.log("action_loss", loss)
         return loss
@@ -166,7 +165,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 1
+        max_epochs = 10
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
@@ -186,7 +185,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 1
+        max_epochs = 50
     )
 
     trainer_acc.fit(acc_model,acc_dl_train,acc_dl_test,ckpt_path=checkpoint_path)
