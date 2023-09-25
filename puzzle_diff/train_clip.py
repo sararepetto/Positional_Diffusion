@@ -38,7 +38,7 @@ class Classification(pl.LightningModule):
     def initialize_torchmetrics(self):
         metrics = {}
 
-        metrics["accuracy"] = torchmetrics.MeanMetric()
+        metrics["action_accuracy"] = torchmetrics.MeanMetric()
         metrics["tau"] = torchmetrics.MeanMetric()
         metrics["pmr"] = torchmetrics.MeanMetric()
         metrics["overall_nImages"] = torchmetrics.SumMetric()
@@ -77,7 +77,7 @@ class Classification(pl.LightningModule):
                 match = (target[i] ==pts)
                 acc = match.float().mean()
             #correct += torch.sum(targets == pts).item()
-                self.metrics["accuracy"].update(acc)
+                self.metrics["action_accuracy"].update(acc)
             self.log_dict(self.metrics)
 
     def validation_epoch_end(self, outputs) -> None:
