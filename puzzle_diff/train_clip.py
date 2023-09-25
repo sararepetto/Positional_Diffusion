@@ -159,13 +159,14 @@ def main(
     checkpoint_callback = ModelCheckpoint(monitor="accuracy", mode="max", save_top_k=2)
 
     trainer = pl.Trainer(
-        accelerator="gpu",
+        #accelerator="gpu",
+        accelerator = "cpu",
         devices=gpus,
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 10
+        max_epochs = 0
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
@@ -179,7 +180,7 @@ def main(
     acc_model.initialize_torchmetrics()
 
     trainer_acc = pl.Trainer(
-        accelerator="gpu",
+        accelerator="cpu",
         devices=gpus,
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,

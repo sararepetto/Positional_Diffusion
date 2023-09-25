@@ -102,7 +102,7 @@ class UCF101Dataset(Dataset):
                 # (T x C X H x W) to (C X T x H x W)
             clip = torch.unsqueeze(torch.stack(trans_clip),dim=0)
             clip = clip.permute([0,1, 3, 4, 2])
-            return clip, torch.tensor(int(class_idx))
+            return clip, torch.tensor(int(class_idx)-1)
     
 
         else:
