@@ -176,6 +176,7 @@ def main(
     else:
         trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
 
+    acc_checkpoint_callback = ModelCheckpoint(monitor="action_accuracy", mode="max", save_top_k=2)
     acc_model = Classification(model.model.visual_backbone,num_classes=101)
     acc_model.initialize_torchmetrics()
 
@@ -185,7 +186,7 @@ def main(
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
         logger=wandb_logger,
-        callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
+        callbacks=[acc_checkpoint_callback, ModelSummary(max_depth=2)],
         max_epochs = 50
     )
 
