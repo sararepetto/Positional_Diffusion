@@ -97,7 +97,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 200
+        max_epochs = 150
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
@@ -115,7 +115,6 @@ def main(
         train_embedding.append(train_data[i][0])
     train_action = np.concatenate(train_action)
     train_embedding = np.concatenate(train_embedding)
-
     test_data=trainer.predict(model,test_dt)
     test_action=[]
     test_embedding=[]
