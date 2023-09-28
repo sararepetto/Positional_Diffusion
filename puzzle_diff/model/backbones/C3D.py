@@ -21,7 +21,7 @@ class C3D(nn.Module):
         self.conv2 = nn.Conv3d(64, 128, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.bn2 = nn.BatchNorm3d(128)
         self.relu2 = nn.ReLU()
-        self.pool2 = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2))
+        self.pool2 = nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2))
 
         self.conv3a = nn.Conv3d(128, 256, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.bn3a = nn.BatchNorm3d(256)
@@ -29,7 +29,7 @@ class C3D(nn.Module):
         self.conv3b = nn.Conv3d(256, 256, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.bn3b = nn.BatchNorm3d(256)
         self.relu3b = nn.ReLU()
-        self.pool3 = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2))
+        self.pool3 = nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2))
 
         self.conv4a = nn.Conv3d(256, 512, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.bn4a = nn.BatchNorm3d(512)
@@ -37,7 +37,7 @@ class C3D(nn.Module):
         self.conv4b = nn.Conv3d(512, 512, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.bn4b = nn.BatchNorm3d(512)
         self.relu4b = nn.ReLU()
-        self.pool4 = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2))
+        self.pool4 = nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2))
 
         self.conv5a = nn.Conv3d(512, 512, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.bn5a = nn.BatchNorm3d(512)
@@ -50,7 +50,7 @@ class C3D(nn.Module):
             self.feature_pool = nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2))   # 9216
             # self.feature_pool = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)) 4182
 
-        self.pool5 = nn.AdaptiveAvgPool3d(1)
+        self.pool5 = nn.AdaptiveAvgPool3d((512,1,1))
 
     
 
@@ -92,12 +92,9 @@ class C3D(nn.Module):
             x = self.feature_pool(x)
             # print(x.shape)
             return x.view(x.shape[0], -1)
-
-        x = self.pool5(x)
-
-        x = x.view(-1, 512)
-
+        x = x.permute(0,2,1,3,4)
         
+        x = self.pool5(x)    
         return x
 
 

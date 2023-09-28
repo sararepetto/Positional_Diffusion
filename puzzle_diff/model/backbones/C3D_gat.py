@@ -57,6 +57,8 @@ class Eff_GAT(nn.Module):
             nn.GELU(),
             nn.Linear(32, output_channels),
         )
+        self.pool = nn.AdaptiveAvgPool3d(1)
+
         mean = torch.tensor([0.4850, 0.4560, 0.4060])[None, :, None, None]
         std = torch.tensor([0.2290, 0.2240, 0.2250])[None, :, None, None]
         self.register_buffer("mean", mean)
@@ -151,4 +153,8 @@ class Eff_GAT(nn.Module):
         # patch_feats = self.visual_backbone.forward(patch_rgb)[3].reshape(
         # patch_rgb.shape[0], -1
         # )
+        patch_feats = patch_feats.permute(0,2,1,3,4)
+        #rifare permute per aver clip,channels,frames.w,h
+        patch_feats = self.pool(patch_feats)
+        patch_feats = patch_feats.view(-1,512)
         return patch_feats

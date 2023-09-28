@@ -34,7 +34,12 @@ class Classification(pl.LightningModule):
         self.backbone = backbone
         self.num_classes = num_classes
         self.linear = nn.Linear(512, self.num_classes)
-    
+        mean = torch.tensor([0.4850, 0.4560, 0.4060])[None, :, None, None]
+        std = torch.tensor([0.2290, 0.2240, 0.2250])[None, :, None, None]
+        self.register_buffer("mean", mean)
+        self.register_buffer("std", std)
+        self.pool = nn.AdaptiveAvgPool3d(1)
+
     def initialize_torchmetrics(self):
         metrics = {}
 
@@ -45,8 +50,12 @@ class Classification(pl.LightningModule):
         self.metrics = nn.ModuleDict(metrics)
         
     def forward(self,x):
+        x = (x - self.mean) / self.std
         x = x.permute(0,2,1,3,4)
         x = self.backbone.forward(x)
+        x = x.permute(0,2,1,3,4)
+        x = self.pool(x)
+        x = x.view(-1,512)
         x = self.linear(x)
         return x
     
