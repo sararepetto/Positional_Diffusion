@@ -357,18 +357,17 @@ def get_dataset_clip (dataset:str,augmentation):
         train_dt = PennAction_clip_dt(train = True)
         test_dt = PennAction_clip_dt(train = False)
         val_dt = PennAction_clip_dt(train = False)
-    if dataset == 'ikea':
+    elif dataset == 'ikea':
         train_dt = IKEA_clip_dt(train=True)
         test_dt = IKEA_clip_dt(train=False)
         val_dt = IKEA_clip_dt(train=False)
-    if dataset == 'UCF101':
+    elif dataset == 'UCF101':
         #train_dataset, val_dataset = random_split(train_dataset, (len(train_dataset)-800, 800))
         train_dt = UCF101_clip_dt(train=True)
         test_dt = UCF101_clip_dt(train=False)
         val_dt = UCF101_clip_dt(train=False)
     else:
         raise Exception(f"Dataset {dataset} is not provided.")
-    
     train_dt = Clip_dataset(train_dt, dataset_get_fn=lambda x: x, augmentation = augmentation,train=True)
     val_dt = Clip_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation,train=False)
     test_dt = Clip_dataset(test_dt, dataset_get_fn=lambda x: x, augmentation = augmentation,train=False)

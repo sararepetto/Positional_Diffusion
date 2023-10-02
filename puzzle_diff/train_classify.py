@@ -43,11 +43,10 @@ class Classification(pl.LightningModule):
 
     def initialize_torchmetrics(self):
         metrics = {}
-
-        metrics["accuracy"] = torchmetrics.MeanMetric()
-        metrics["tau"] = torchmetrics.MeanMetric()
-        metrics["pmr"] = torchmetrics.MeanMetric()
-        metrics["overall_nImages"] = torchmetrics.SumMetric()
+        metrics["action_accuracy"] = torchmetrics.MeanMetric()
+        #metrics["tau"] = torchmetrics.MeanMetric()
+        #metrics["pmr"] = torchmetrics.MeanMetric()
+        #metrics["overall_nImages"] = torchmetrics.SumMetric()
         self.metrics = nn.ModuleDict(metrics)
         
     def forward(self,x):
@@ -87,7 +86,7 @@ class Classification(pl.LightningModule):
                 match = (target[i] ==pts)
                 acc = match.float().mean()
             #correct += torch.sum(targets == pts).item()
-                self.metrics["accuracy"].update(acc)
+                self.metrics["action_accuracy"].update(acc)
             self.log_dict(self.metrics)
 
     def validation_epoch_end(self, outputs) -> None:
@@ -157,7 +156,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 150
+        max_epochs = 50
     )
 
     trainer_acc.fit(acc_model,acc_dl_train,acc_dl_test,ckpt_path=checkpoint_path)

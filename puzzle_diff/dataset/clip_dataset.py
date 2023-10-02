@@ -93,16 +93,14 @@ class Clip_dataset(pyg_data.Dataset):
 
 
 if __name__ == "__main__":
-    from UCF101_clip_dt import UCF101_clip_dt
-    train_dt = UCF101_clip_dt(train = False)
+    from clip_PennAction_dt import PennAction_clip_dt
+    train_dt = PennAction_clip_dt(train = False)
     dt = Clip_dataset(train_dt, dataset_get_fn=lambda x: x, train=False)
-
-    dl = torch_geometric.loader.DataLoader(dt, batch_size=2)
+    dl = torch_geometric.loader.DataLoader(dt, batch_size=1)
     dl_iter = iter(dl)
 
     for i in range(5):
         k = next(dl_iter)
-        breakpoint()
         print(k)
 
         

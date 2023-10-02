@@ -15,7 +15,7 @@ from PIL import Image
 import string
 
 class PennAction_clip_dt(Dataset):
-    def __init__(self,train=True, clip_len =10, interval = 4, tuple_len = 3, subsampling=3):
+    def __init__(self,train=True, clip_len = 4, interval = 3, tuple_len = 4, subsampling=3):
         super().__init__()
         self.subsampling = subsampling
         self.clip_len = clip_len
@@ -90,30 +90,39 @@ class PennAction_clip_dt(Dataset):
 
     def __getitem__(self,idx):
         imgs = self.frames[idx]
+        imgs = imgs[2:]
+        tuple_len = int((len(imgs) + 3)/7)
         actions = self.actions[idx]
         x_coordinates = self.X_coordinates[idx]
         y_coordinates = self.Y_coordinates[idx]
-        length = len(imgs)
         tuple_clip = []
         tuple_Xcoordinates = []
         tuple_Ycoordinates = []
+        action = []
 
-        if self.train:
-            tuple_start = random.randint(0, length - self.tuple_total_frames)
-        else:
-            random.seed(idx)
-            tuple_start = random.randint(0, length - self.tuple_total_frames)
-        clip_start = tuple_start
+        #if self.train:
+            #tuple_start = random.randint(0, length - self.tuple_total_frames)
+        #else:
+            #random.seed(idx)
+           # tuple_start = random.randint(0, length - self.tuple_total_frames)
+        clip_start = 0
 
-        for _ in range(self.tuple_len):
+        for i in range(tuple_len):
+           
+           # breakpoint()
+            #if i == self.tuple_len -1:
+                #clip = imgs[clip_start:]
+            #else:
             clip = imgs[clip_start: clip_start + self.clip_len]
             X_coordinates = x_coordinates[clip_start: clip_start + self.clip_len]
             Y_coordinates = y_coordinates[clip_start: clip_start + self.clip_len]
+            act = actions[clip_start: clip_start + self.clip_len]
+            act = torch.from_numpy(act)
+            action.append(act)
             tuple_clip.append(clip)
             tuple_Xcoordinates.append(X_coordinates)
             tuple_Ycoordinates.append(Y_coordinates)
             clip_start = clip_start + self.clip_len + self.interval
-
         videos=[]
         for i in range(len(tuple_clip)):
             #video = []
@@ -135,13 +144,14 @@ class PennAction_clip_dt(Dataset):
             videos.append(video)
         
         video = torch.stack(videos)
-        return video,actions
+        action = torch.flatten(torch.stack(action))
+        return video,action
        
 
 
 
 if __name__ == "__main__":
-        dt = PennAction_RGB_dt()           
+        dt = PennAction_clip_dt()           
         frames=0
         x= dt[20]
         print(len(x))
