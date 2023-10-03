@@ -66,6 +66,7 @@ class Classification(pl.LightningModule):
         input = train_batch.frames
         target = train_batch.action
         output = self.forward(input)
+        #breakpoint()
         criterion = nn.CrossEntropyLoss()
         loss = criterion(output,target)
         self.log("action_loss", loss)
@@ -87,8 +88,7 @@ class Classification(pl.LightningModule):
                 new_target = torch.flatten(target[val_batch.batch == i])
                 #new_output = torch.mean(new_output, dim = 0)
                 pts = torch.argmax(new_output,dim=1)
-
-                match = (new_target[i] ==pts)
+                match = (new_target ==pts)
                 acc = match.float().mean()
             #correct += torch.sum(targets == pts).item()
                 self.metrics["action_accuracy"].update(acc)
@@ -180,7 +180,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 150
+        max_epochs = 0
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
@@ -191,11 +191,11 @@ def main(
         trainer.fit(model, dl_train, dl_test, ckpt_path=checkpoint_path)
 
     acc_checkpoint_callback = ModelCheckpoint(monitor="action_accuracy", mode="max", save_top_k=2)
-    acc_model = Classification(model.model.visual_backbone,num_classes=4)
+    acc_model = Classification(model.model.visual_backbone,num_classes=6)
     acc_model.initialize_torchmetrics()
 
     trainer_acc = pl.Trainer(
-        accelerator="gpu",
+        accelerator="cpu",
         devices=gpus,
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
