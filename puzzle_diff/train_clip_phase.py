@@ -66,10 +66,14 @@ class Classification(pl.LightningModule):
         input = train_batch.frames
         target = train_batch.action
         output = self.forward(input)
-        #breakpoint()
         criterion = nn.CrossEntropyLoss()
         loss = criterion(output,target)
         self.log("action_loss", loss)
+        print(loss)
+        print(target.shape)
+        print(output.shape)
+        if loss == 'nan':
+            print(1)
         return loss
     
     def validation_step(self, val_batch, batch_idx):

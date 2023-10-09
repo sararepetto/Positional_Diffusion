@@ -15,7 +15,7 @@ from PIL import Image
 import string
 
 class PennAction_clip_dt(Dataset):
-    def __init__(self,train=True, clip_len = 4, interval = 3, tuple_len = 4, subsampling=3):
+    def __init__(self,train=True, clip_len = 4, interval = 4, tuple_len = 4, subsampling=3):
         super().__init__()
         self.subsampling = subsampling
         self.clip_len = clip_len
@@ -63,6 +63,7 @@ class PennAction_clip_dt(Dataset):
         self.actions = []
         self.X_coordinates = []
         self.Y_coordinates = []
+        tuples = []
         for i in range(len(self.list_files)):
             phase_path = "datasets/Penn_Action/phase_labels"
             elements = [i.replace(".npy","") for i in os.listdir(phase_path) ]
@@ -82,15 +83,14 @@ class PennAction_clip_dt(Dataset):
                 self.actions.append(phases)
                 self.X_coordinates.append(self.x_coordinates)
                 self.Y_coordinates.append(self.y_coordinates)
+               
 
-   
     def __len__(self):
         return len(self.frames)
   
 
     def __getitem__(self,idx):
         imgs = self.frames[idx]
-        imgs = imgs[2:]
         tuple_len = int((len(imgs) + 3)/7)
         actions = self.actions[idx]
         x_coordinates = self.X_coordinates[idx]
@@ -118,10 +118,11 @@ class PennAction_clip_dt(Dataset):
             Y_coordinates = y_coordinates[clip_start: clip_start + self.clip_len]
             act = actions[clip_start: clip_start + self.clip_len]
             act = torch.from_numpy(act)
-            action.append(act)
-            tuple_clip.append(clip)
-            tuple_Xcoordinates.append(X_coordinates)
-            tuple_Ycoordinates.append(Y_coordinates)
+            if len(clip)==4:
+                action.append(act)
+                tuple_clip.append(clip)
+                tuple_Xcoordinates.append(X_coordinates)
+                tuple_Ycoordinates.append(Y_coordinates)
             clip_start = clip_start + self.clip_len + self.interval
         videos=[]
         for i in range(len(tuple_clip)):
