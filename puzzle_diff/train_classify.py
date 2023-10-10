@@ -143,7 +143,7 @@ def main(
         tags=tags,
     )
 
-    checkpoint_callback = ModelCheckpoint(monitor="accuracy", mode="max", save_top_k=2)
+    checkpoint_callback = ModelCheckpoint(monitor="action_accuracy", mode="max", save_top_k=2)
 
     model = C3D()
     acc_model = Classification(model,num_classes=101)
