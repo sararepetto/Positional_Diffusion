@@ -64,6 +64,7 @@ class Classification(pl.LightningModule):
     
     def training_step(self, train_batch, batch_idx):
         input = train_batch.frames
+        print(input.shape)
         target = train_batch.action
         output = self.forward(input)
         criterion = nn.CrossEntropyLoss()
@@ -72,6 +73,7 @@ class Classification(pl.LightningModule):
         print(loss)
         print(target.shape)
         print(output.shape)
+        print(output)
         if loss == 'nan':
             print(1)
         return loss
