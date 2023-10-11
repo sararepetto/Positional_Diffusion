@@ -59,7 +59,7 @@ class Classification(pl.LightningModule):
         return x
     
     def configure_optimizers(self):
-        optimizer = optim.SGD(self.parameters(), lr=1e-3, momentum=9e-1, weight_decay=5e-4)
+        optimizer = optim.SGD(self.parameters(), lr=1e-5, momentum=9e-1, weight_decay=5e-4, nesterov = True)
         return optimizer
     
     def training_step(self, train_batch, batch_idx):
@@ -71,8 +71,6 @@ class Classification(pl.LightningModule):
         loss = criterion(output,target)
         self.log("action_loss", loss)
         print(loss)
-        print(target.shape)
-        print(output.shape)
         print(output)
         if loss == 'nan':
             print(1)
@@ -201,13 +199,16 @@ def main(
     acc_model.initialize_torchmetrics()
 
     trainer_acc = pl.Trainer(
-        accelerator="cpu",
+        accelerator="gpu",
         devices=gpus,
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[acc_checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 50
+        max_epochs = 50,
+        gradient_clip_val = 1,
+        gradient_clip_algorithm = "value",
+        detect_anomaly=True,
     )
 
     trainer_acc.fit(acc_model,dl_train,dl_test,ckpt_path=checkpoint_path)
