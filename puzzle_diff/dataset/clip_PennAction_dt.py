@@ -79,10 +79,11 @@ class PennAction_clip_dt(Dataset):
                 #for j in range(subsampling):
                 #z = random.randint(0,self.subsampling)
                     ##[j*subsampling:(j+1)*subsampling]
-                self.frames.append(imgs)
-                self.actions.append(phases)
-                self.X_coordinates.append(self.x_coordinates)
-                self.Y_coordinates.append(self.y_coordinates)
+                if 5 not in phases:
+                    self.frames.append(imgs)
+                    self.actions.append(phases)
+                    self.X_coordinates.append(self.x_coordinates)
+                    self.Y_coordinates.append(self.y_coordinates)
                
 
     def __len__(self):
