@@ -136,6 +136,7 @@ class GNN_Diffusion(pl.LightningModule):
         warmup_steps=1000,
         max_train_steps=10000,
         finetuning=False,
+        phase=False,
         *args,
         **kwargs,
     ) -> None:
@@ -206,7 +207,7 @@ class GNN_Diffusion(pl.LightningModule):
 
         ### BACKBONE
         #self.model = Eff_GAT_TEXT(steps=steps, input_channels=1, output_channels=1)
-        self.model = Eff_GAT(steps=steps, input_channels=1, output_channels=1,finetuning = finetuning)
+        self.model = Eff_GAT(steps=steps, input_channels=1, output_channels=1,finetuning = finetuning, phase=phase)
         self.save_hyperparameters()
 
     def initialize_torchmetrics(self):

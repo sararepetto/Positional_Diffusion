@@ -16,13 +16,14 @@ class Eff_GAT(nn.Module):
         nn (_type_): _description_
     """
 
-    def __init__(self, steps, input_channels=2, output_channels=2, finetuning=False) -> None:
+    def __init__(self, steps, input_channels=2, output_channels=2, finetuning=False,phase=False) -> None:
         super().__init__()
         self.finetuning = finetuning
+        self.phase = phase
         #self.visual_backbone = timm.create_model(
             #"efficientnet_b0", pretrained= True, features_only=True
         #)
-        self.visual_backbone = C3D()
+        self.visual_backbone = C3D(phase=phase)
 
         self.input_channels = input_channels
         self.output_channels = output_channels
@@ -153,8 +154,9 @@ class Eff_GAT(nn.Module):
         # patch_feats = self.visual_backbone.forward(patch_rgb)[3].reshape(
         # patch_rgb.shape[0], -1
         # )
-        patch_feats = patch_feats.permute(0,2,1,3,4)
+        if self.phase==True:
+            patch_feats = patch_feats.permute(0,2,1,3,4)
         #rifare permute per aver clip,channels,frames.w,h
-        patch_feats = self.pool(patch_feats)
-        patch_feats = patch_feats.view(-1,512)
+            patch_feats = self.pool(patch_feats)
+            patch_feats = patch_feats.view(-1,512)
         return patch_feats

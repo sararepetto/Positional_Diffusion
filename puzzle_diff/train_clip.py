@@ -52,9 +52,9 @@ class Classification(pl.LightningModule):
         x = (x - self.mean) / self.std
         x = x.permute(0,2,1,3,4)
         x = self.backbone.forward(x)
-        x = x.permute(0,2,1,3,4)
-        x = self.pool(x)
-        x = x.view(-1,512)
+        #x = x.permute(0,2,1,3,4)
+        #x = self.pool(x)
+        #x = x.view(-1,512)
         x = self.linear(x)
         return x
     
@@ -146,7 +146,8 @@ def main(
         warmup_steps=epoch_steps,
         max_train_steps=max_steps,
         noise_weight=noise_weight,
-        finetuning=finetuning
+        finetuning=finetuning,
+        phase=False,
     )
     model.initialize_torchmetrics()
 

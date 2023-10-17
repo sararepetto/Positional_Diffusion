@@ -65,7 +65,6 @@ class Classification(pl.LightningModule):
     
     def training_step(self, train_batch, batch_idx):
         input = train_batch.frames
-        print(input.shape)
         target = train_batch.action
         output = self.forward(input)
         criterion = nn.CrossEntropyLoss()
@@ -157,7 +156,8 @@ def main(
         warmup_steps=epoch_steps,
         max_train_steps=max_steps,
         noise_weight=noise_weight,
-        finetuning=finetuning
+        finetuning=finetuning,
+        phase=True
     )
     model.initialize_torchmetrics()
 
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     ap.add_argument("--finetuning", type=bool, default=False)
     ap.add_argument("--subsampling", type=int, default = 3)
     ap.add_argument("--augmentation", type=bool, default = False)
-
+    #ap.add_argument("--phase", type=bool, default = False)
     args = ap.parse_args()
     print(args)
     main(
