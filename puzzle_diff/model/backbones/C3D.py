@@ -93,8 +93,8 @@ class C3D(nn.Module):
             # print(x.shape)
             return x.view(x.shape[0], -1)
         x = x.permute(0,2,1,3,4)
-        
-        x = self.pool5(x)    
+        x = self.pool5(x) 
+       
         return x
 
 

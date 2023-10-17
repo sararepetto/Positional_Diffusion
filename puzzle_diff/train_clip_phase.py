@@ -59,7 +59,8 @@ class Classification(pl.LightningModule):
         return x
     
     def configure_optimizers(self):
-        optimizer = optim.SGD(self.parameters(), lr=1e-5, momentum=9e-1, weight_decay=5e-4, nesterov = True)
+        #optimizer = optim.SGD(self.parameters(), lr=1e-5, momentum=9e-1, weight_decay=5e-4, nesterov = True)
+        optimizer = optim.Adam(self.parameters(), lr= 1e-4)
         return optimizer
     
     def training_step(self, train_batch, batch_idx):
@@ -184,7 +185,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 150
+        max_epochs = 0
     )
     if evaluate:
         model = sd.GNN_Diffusion.load_from_checkpoint(checkpoint_path)
