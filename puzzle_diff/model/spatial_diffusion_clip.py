@@ -466,7 +466,7 @@ class GNN_Diffusion(pl.LightningModule):
         )
 
     def configure_optimizers(self):
-        optimizer = Adafactor(self.parameters(),weight_decay=0.001)
+        optimizer = Adafactor(self.parameters())
         return optimizer
 
 

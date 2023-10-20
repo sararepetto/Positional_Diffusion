@@ -25,6 +25,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch 
 import torchmetrics
+from transformers.optimization import Adafactor
+
 
 #classe(backbone,num_classes):
 #backbone+mlp
@@ -59,7 +61,7 @@ class Classification(pl.LightningModule):
         return x
     
     def configure_optimizers(self):
-        optimizer = optim.SGD(self.parameters(), lr=1e-3, momentum=9e-1, weight_decay=5e-4)
+        optimizer  = Adafactor(self.parameters())
         return optimizer
     
     def training_step(self, train_batch, batch_idx):
