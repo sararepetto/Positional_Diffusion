@@ -138,7 +138,7 @@ class PennAction_clip_dt(Dataset):
                 ymin = np.min(tuple_Ycoordinates[i][j]) - min(np.min(tuple_Ycoordinates[i][j]),20)
                 ymax = np.max (tuple_Ycoordinates[i][j]) + min((image.shape[0]-np.max(tuple_Ycoordinates[i][j])),20)
                 image = image[int(ymin):int(ymax),int(xmin):int(xmax)]
-                image = cv2.resize(image,(70,70))
+                image = cv2.resize(image,(200,200))
                 image = torch.from_numpy(image)
             #image = Image.fromarray(image.astype('uint8'), 'RGB')
                 video.append(image)
@@ -160,5 +160,5 @@ if __name__ == "__main__":
         print(x[0].shape)
         plt.figure()
         plt.imshow(x[0][0][0])
-        plt.imshow(x[0][1][0])
+        plt.imshow(x[0][13][0])
         plt.show()                          
