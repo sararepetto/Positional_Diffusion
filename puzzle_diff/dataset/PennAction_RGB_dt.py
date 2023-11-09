@@ -66,6 +66,7 @@ class PennAction_RGB_dt(Dataset):
         for i in range(len(self.list_files)):
             video_path = f"datasets/Penn_Action/train_frames/{self.list_files[i]}/*.jpg"
             action_path = self.phase[i]
+            breakpoint()
             labels = scipy.io.loadmat(f'datasets/Penn_Action/labels/{self.list_files[i]}.mat')
             self.x_coordinates = labels ['x']
             self.y_coordinates = labels['y']

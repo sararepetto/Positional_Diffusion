@@ -120,6 +120,25 @@ class Eff_GAT(nn.Module):
         # GNN
         feats = self.gnn_backbone(x=combined_feats, edge_index=edge_index)
         return feats
+    
+    def forward_with_embedding_diffusion(
+        self: nn.Module,
+        xy_pos: Tensor,
+        time: Tensor,
+        edge_index: Tensor,
+        patch_feats: Tensor,
+    ): 
+        #new_t = torch.gather(t, 0, batch.batch)
+        time_feats = self.time_emb(time)  # embedding, int -> 32
+        pos_feats = self.pos_mlp(xy_pos)  # MLP, (x, y) -> 32
+        # COMBINE  and transform with MLP
+        patch_feats = self.visual_features(patch_feats)
+        combined_feats = torch.cat([patch_feats, pos_feats, time_feats], -1)
+        combined_feats = self.mlp(combined_feats)
+        # GNN
+        feats = self.gnn_backbone(x=combined_feats, edge_index=edge_index)
+        return feats
+    
 
     def visual_features(self, patch_rgb):
         #patch_rgb = patch_rgb.permute(0,3,1,2)

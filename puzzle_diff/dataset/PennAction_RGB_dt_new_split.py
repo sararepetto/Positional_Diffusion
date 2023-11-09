@@ -73,13 +73,14 @@ class PennAction_RGB_dt(Dataset):
                 self.x_coordinates = labels ['x']
                 self.y_coordinates = labels['y']
                 imgs = sorted(glob.glob(video_path))
-                for j in range(subsampling):
+                if 5 not in phases:
+                    for j in range(subsampling):
                 #z = random.randint(0,self.subsampling)
                     ##[j*subsampling:(j+1)*subsampling]
-                    self.frames.append(imgs[j::self.subsampling])
-                    self.actions.append(phases[j::self.subsampling])
-                    self.X_coordinates.append(self.x_coordinates[j::self.subsampling])
-                    self.Y_coordinates.append(self.y_coordinates[j::self.subsampling])
+                        self.frames.append(imgs[j::self.subsampling])
+                        self.actions.append(phases[j::self.subsampling])
+                        self.X_coordinates.append(self.x_coordinates[j::self.subsampling])
+                        self.Y_coordinates.append(self.y_coordinates[j::self.subsampling])
    
     def __len__(self):
         return len(self.frames)
