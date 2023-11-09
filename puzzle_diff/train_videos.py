@@ -173,9 +173,9 @@ def main(
 
     trainer = pl.Trainer(
         #
-        #accelerator="gpu",
-        #devices=gpus,
-        accelerator='cpu',
+        accelerator="gpu",
+        devices=gpus,
+        #accelerator='cpu',
         #devices=cpu,
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
@@ -210,9 +210,9 @@ def main(
     acc_model.initialize_torchmetrics()
 
     trainer_acc = pl.Trainer(
-        #accelerator="gpu",
-        #devices=gpus,
-        accelerator='cpu',
+        accelerator="gpu",
+        devices=gpus,
+        #accelerator='cpu',
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
         logger=wandb_logger,
