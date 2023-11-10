@@ -219,7 +219,7 @@ def main(
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[acc_checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 50,
+        max_epochs = 150,
         gradient_clip_val = 1,
         gradient_clip_algorithm = "value",
         detect_anomaly=True,
