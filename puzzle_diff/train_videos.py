@@ -126,7 +126,8 @@ def main(
     evaluate,
     finetuning,
     subsampling,
-    augmentation
+    augmentation,
+    feature_t,
 ):
     ### Define dataset
     train_dt, val_dt, test_dt = get_dataset_videos(dataset=dataset,subsampling=subsampling, augmentation=augmentation)
@@ -151,7 +152,8 @@ def main(
         warmup_steps=epoch_steps,
         max_train_steps=max_steps,
         noise_weight=noise_weight,
-        finetuning=finetuning
+        finetuning=finetuning,
+        feature_t = feature_t,
     )
     model.initialize_torchmetrics()
 
@@ -244,7 +246,7 @@ if __name__ == "__main__":
     ap.add_argument("--finetuning", type=bool, default=False)
     ap.add_argument("--subsampling", type=int, default = 3)
     ap.add_argument("--augmentation", type=bool, default = False)
-
+    ap.add_argument("--feature_t", type=int, default = 100)
     args = ap.parse_args()
     print(args)
     main(
@@ -262,5 +264,6 @@ if __name__ == "__main__":
         evaluate=args.evaluate,
         finetuning= args.finetuning,
         subsampling=args.subsampling,
-        augmentation=args.augmentation
+        augmentation=args.augmentation,
+        feature_t = args.feature_t
     )

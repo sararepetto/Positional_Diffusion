@@ -136,6 +136,7 @@ class GNN_Diffusion(pl.LightningModule):
         warmup_steps=1000,
         max_train_steps=10000,
         finetuning=False,
+        feature_t = 100,
         *args,
         **kwargs,
     ) -> None:
@@ -148,6 +149,7 @@ class GNN_Diffusion(pl.LightningModule):
 
         self.warmup_steps = warmup_steps
         self.max_train_steps = max_train_steps
+        self.feature_t = feature_t
         ### DIFFUSION STUFF
 
         if sampling == "DDPM":
@@ -550,9 +552,12 @@ class GNN_Diffusion(pl.LightningModule):
         
     def predict_step(self,batch,batch_idx):#tornare features e phases
         batch_size = 1
-        t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
+        t = torch.ones((batch_size,),device =self.device).long()*self.feature_t
+        #t = torch.randint(0, self.steps, (batch_size,), device=self.device).long()
+        noise = torch.randn_like(batch.x)
+        x_noisy = self.q_sample(x_start=batch.x, t=t, noise=noise)
         new_t = t.repeat(len(batch.x))
-        self.features = self.model.forward_with_embedding(batch.x, new_t,  batch.edge_index,batch.frames)
+        self.features = self.model.forward_with_embedding(x_noisy, new_t,  batch.edge_index,batch.frames)
         self.actions = batch.action
         return self.features, self.actions
      
