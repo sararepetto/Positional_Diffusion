@@ -19,8 +19,8 @@ class Eff_GAT(nn.Module):
     def __init__(self, steps, input_channels=2, output_channels=2, finetuning=False) -> None:
         super().__init__()
         self.finetuning = finetuning
-        #self.visual_backbone = timm.create_model(
-            #"efficientnet_b0", pretrained= True, features_only=True
+       # self.visual_backbone = timm.create_model(
+        #    "efficientnet_b0", pretrained= True, features_only=True
         #)
         self.visual_backbone =  torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
 
@@ -133,20 +133,20 @@ class Eff_GAT(nn.Module):
                     #-1,
                 #)
         else:
-            feats = self.visual_backbone.forward(patch_rgb)
-            patch_feats = torch.cat(
+            patch_feats = self.visual_backbone.forward(patch_rgb)
+           # patch_feats = torch.cat(
                 #[
                    # feats[2].reshape(patch_rgb.shape[0], -1),
                     #feats[3].reshape(patch_rgb.shape[0], -1),
                 #],
                 #-1,
             #)
-                [
-                   feats[1].reshape(patch_rgb.shape[0], -1),
-                    feats[2].reshape(patch_rgb.shape[0], -1),
-                ],
-                -1,
-            )
+                #[
+                 #  feats[1].reshape(patch_rgb.shape[0], -1),
+                  #  feats[2].reshape(patch_rgb.shape[0], -1),
+                #],
+                #-1,
+            #)
         
         # patch_feats = self.visual_backbone.forward(patch_rgb)[3].reshape(
         # patch_rgb.shape[0], -1
