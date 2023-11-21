@@ -134,7 +134,7 @@ class UCF101Dataset(Dataset):
         
 
 if __name__ == "__main__":
-        dt = UCF101Dataset(train = True)           
+        dt = UCF101Dataset(train = False)           
         frames=0
         x= dt[20]
         breakpoint()

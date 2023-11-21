@@ -138,7 +138,6 @@ def main(
     dl_test = torch_geometric.loader.DataLoader(
         test_dt, batch_size=batch_size, num_workers=num_workers, shuffle=False
     )
-
     epoch_steps = len(dl_train) * 10
     max_steps = len(dl_train) * 100
 
@@ -174,10 +173,9 @@ def main(
     checkpoint_callback = ModelCheckpoint(monitor="accuracy", mode="max", save_top_k=2)
 
     trainer = pl.Trainer(
-        #
-        accelerator="gpu",
-        devices=gpus,
-        #accelerator='cpu',
+        #accelerator="gpu",
+        #devices=gpus,
+        accelerator='cpu',
         #devices=cpu,
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
@@ -212,14 +210,14 @@ def main(
     acc_model.initialize_torchmetrics()
 
     trainer_acc = pl.Trainer(
-        accelerator="gpu",
-        devices=gpus,
+        accelerator="cpu",
+        #devices=gpus,
         #accelerator='cpu',
         strategy="ddp" if gpus > 1 else None,
         check_val_every_n_epoch=10,
         logger=wandb_logger,
         callbacks=[acc_checkpoint_callback, ModelSummary(max_depth=2)],
-        max_epochs = 150,
+        max_epochs = 50,
         gradient_clip_val = 1,
         gradient_clip_algorithm = "value",
         detect_anomaly=True,

@@ -115,7 +115,12 @@ def sigmoid_beta_schedule(timesteps):
 
 def extract(a, t, x_shape=None):
     batch_size = t.shape[0]
-    out = a.gather(-1, t)
+    try:
+        out = a.gather(-1, t)
+    except:
+        breakpoint()
+        print(a)
+        print(t)
     return out[:, None]  # out.reshape(batch_size, *((1,) * (len(x_shape) - 1)))
 
 
@@ -242,7 +247,6 @@ class GNN_Diffusion(pl.LightningModule):
     def q_sample(self, x_start, t, noise=None):
         if noise is None:
             noise = torch.randn_like(x_start)
-
         sqrt_alphas_cumprod_t = extract(self.sqrt_alphas_cumprod, t, x_start.shape)
         sqrt_one_minus_alphas_cumprod_t = extract(
             self.sqrt_one_minus_alphas_cumprod, t, x_start.shape
